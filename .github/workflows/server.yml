@@ -37,3 +37,27 @@ jobs:
       - name: Test with unittest
         run: |
           python -m unittest -v
+
+  docker:
+    name: Build server docker image
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to personal Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.REGISTRY_NAME }}
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_PASS }}
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: ./server
+          push: true
+          tags: ${{ secrets.REGISTRY_NAME }}/chatrooms/server:latest
