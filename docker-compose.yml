@@ -1,0 +1,23 @@
+version: "3.6"
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    expose:
+      - 5000
+    #restart: until-stopped
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        EXPOSE_PORT: 4123
+    environment:
+      # node environment variables
+      NODE_ENV: production
+      PORT: 4123
+      API_URL: http://server:5000
+    ports:
+      - "8000:4123"
