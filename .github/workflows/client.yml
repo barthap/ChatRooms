@@ -71,5 +71,3 @@ jobs:
           context: ./client
           push: true
           tags: ${{ secrets.REGISTRY_NAME }}/chatrooms/client:latest
-          cache-from: type=registry,${{ secrets.REGISTRY_NAME }}/chatrooms/client:latest
-          cache-to: type=inline
