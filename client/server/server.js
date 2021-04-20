@@ -1,5 +1,3 @@
-"use strict";
-
 const express = require("express");
 const path = require("path");
 const httpProxy = require("http-proxy");
@@ -42,7 +40,7 @@ app.all("/api/*", function (req, res) {
 });
 
 // All remaining requests return the React app, so it can handle routing.
-app.get("*", function (request, response) {
+app.get("*", function (_request, response) {
   response.sendFile(path.join(CLIENT_BUILD_PATH, "index.html"));
 });
 
