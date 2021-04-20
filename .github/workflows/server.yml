@@ -61,3 +61,5 @@ jobs:
           context: ./server
           push: true
           tags: ${{ secrets.REGISTRY_NAME }}/chatrooms/server:latest
+          cache-from: type=registry,${{ secrets.REGISTRY_NAME }}/chatrooms/server:latest
+          cache-to: type=inline
