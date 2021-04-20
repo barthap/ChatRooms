@@ -1,0 +1,9 @@
+version: "3.6"
+
+services:
+  server:
+    image: "${REGISTRY_NAME}/chatrooms/server:latest"
+  client:
+    image: "${REGISTRY_NAME}/chatrooms/client:latest"
+    env_file:
+      - proxy_host.env

@@ -7,7 +7,6 @@ services:
       dockerfile: Dockerfile
     expose:
       - 5000
-    #restart: until-stopped
   client:
     build:
       context: ./client
