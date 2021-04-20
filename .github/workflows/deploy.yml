@@ -1,0 +1,29 @@
+name: Deploy
+
+defaults:
+  run:
+    shell: bash
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deplpoy:
+    name: Deploy to docker host
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Push deployment scripts
+        uses: appleboy/scp-action@master
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PORT: ${{ secrets.PORT }}
+          KEY: ${{ secrets.SSHKEY }}
+        with:
+          source: "deploy.sh,docker-compose.yml,docker-compose.deployment.yml"
+          target: /home/${{ secrets.USERNAME }}/chatrooms
+          # rm: true # remove old website contents
+          # strip_components: 2 # remove website/public/ prefix
