@@ -1,0 +1,13 @@
+version: "3.6"
+
+services:
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        EXPOSE_PORT: 4123
