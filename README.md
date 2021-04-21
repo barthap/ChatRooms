@@ -72,7 +72,7 @@ There is possibility to deploy the app into local docker environment.
 docker-compose up -d --build
 ```
 
-Both client and API server containers will be rebuilt (`--build` flags) and finally the client app will be listening on http://localhost:8000. The API server will be available at http://localhost:8000/api/
+Both client and API server containers will be rebuilt (`--build` flags) and finally the client app will be listening on http://localhost:4121. The API server will be available at http://localhost:4121/api/
 
 ### Modifying client proxy server (without docker)
 
@@ -82,8 +82,8 @@ To start the proxy server:
 
 1. `cd` into `client/server`
 2. `yarn start` (do `yarn install` before if running for the first time)
-3. The proxy server will start at http://localhost:4123. If Python API server is listening at port `5000`, it will be available at http://localhost:4123/api.
-4. To make client app available at port `4123`, you need to build it first by runniny `yarn build` from the `client` directory.
+3. The proxy server will start at http://localhost:4121. If Python API server is listening at port `5000`, it will be available at http://localhost:4121/api.
+4. To make client app available at port `4121`, you need to build it first by runniny `yarn build` from the `client` directory.
 
 ## Deploying to production server
 
