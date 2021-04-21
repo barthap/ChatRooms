@@ -8,9 +8,9 @@ services:
     env_file:
       - client.env
     environment:
-      - VIRTUAL_HOST
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
       - VIRTUAL_PORT=${CLIENT_PORT:-4121}
-      - LETSENCRYPT_HOST
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
     expose:
       - ${CLIENT_PORT:-4121}
     networks:
