@@ -31,14 +31,26 @@ yarn install
 
 ### Running locally
 
-API Server is based on Python Flask. To start development server:
+#### API Server
+
+API Server is based on Python [`flask-socketio`](https://flask-socketio.readthedocs.io/en/latest/). To start development server:
 
 ```sh
 cd server
-python3 -m flask run
+python3 -u app.py
 ```
 
 The API server starts at http://localhost:5000.
+
+##### Quick testing the API server
+
+To test server without worrying about running heavyweight React client, you can use:
+
+- prepared for this purpose `server/browser_playground` HTML files - see [`README.md`](./server/browser_playground/README.md) in there.
+- Postman - for HTTP communication with Flask endpoints
+- [This awesome tool](https://amritb.github.io/socketio-client-tool/) - just enter `http://localhost:5000` and connect. You can communicate with server without writing any client-side code!
+
+#### Web Client
 
 To start web client locally:
 
@@ -64,7 +76,7 @@ Both client and API server containers will be rebuilt (`--build` flags) and fina
 
 ### Modifying client proxy server (without docker)
 
-Client is hosted in separate container using `express` server. It also acts as a proxy to the Flask API server at `/api` endpoint. The server code is located at `client/server/server.js`.
+Client is hosted in a separate container using `express` server. It also acts as a proxy to the Flask API server at `/api` endpoint. The server code is located at `client/server/server.js`.
 
 To start the proxy server:
 

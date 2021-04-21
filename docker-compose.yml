@@ -4,11 +4,24 @@ services:
   server:
     expose:
       - 5000
+    environment:
+      # to display print() in docker logs
+      - PYTHONUNBUFFERED=1
+    networks:
+      - chatrooms_net
   client:
     environment:
       # node environment variables
       NODE_ENV: production
       PORT: 4123
       API_URL: http://server:5000
+    depends_on:
+      - server
     ports:
       - "8000:4123"
+    networks:
+      - chatrooms_net
+
+networks:
+  chatrooms_net:
+    driver: bridge
