@@ -23,23 +23,18 @@ jobs:
           PORT: ${{ secrets.PORT }}
           KEY: ${{ secrets.SSHKEY }}
         with:
-          source: "deploy.sh,docker-compose.yml,docker-compose.deployment.yml"
+          source: "deploy.sh,docker-compose.yml,docker-compose.deployment.yml,.env"
           target: /home/${{ secrets.USERNAME }}/chatrooms
       - name: Execute deployment script
         uses: appleboy/ssh-action@master
         env:
-          PROXY_URL: http://${{ secrets.HOST }}:8000
+          APP_DOMAIN: ${{ secrets.APP_DOMAIN }}
           REGISTRY_NAME: ${{ secrets.REGISTRY_NAME }}
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSHKEY }}
           port: ${{ secrets.PORT }}
-          envs: PROXY_URL,REGISTRY_NAME
+          envs: APP_DOMAIN,REGISTRY_NAME
           script_stop: true
-          script: |
-            export PROXY_URL=$PROXY_URL
-            export REGISTRY_NAME=$REGISTRY_NAME
-            cd /home/${{ secrets.USERNAME }}/chatrooms
-            chmod +x deploy.sh
-            ./deploy.sh
+          script: /home/${{ secrets.USERNAME }}/chatrooms/deploy.sh

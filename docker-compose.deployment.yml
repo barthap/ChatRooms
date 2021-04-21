@@ -6,4 +6,17 @@ services:
   client:
     image: "${REGISTRY_NAME}/chatrooms/client:latest"
     env_file:
-      - proxy_host.env
+      - client.env
+    environment:
+      - VIRTUAL_HOST
+      - VIRTUAL_PORT=${CLIENT_PORT:-4121}
+      - LETSENCRYPT_HOST
+    expose:
+      - ${CLIENT_PORT:-4121}
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external:
+      name: nginx-proxy

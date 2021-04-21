@@ -4,20 +4,20 @@ const httpProxy = require('http-proxy');
 const path = require('path');
 
 // Constants
-const PORT = process.env.PORT || 4123;
+const PORT = process.env.CLIENT_PORT || 4121;
 const HOST = '0.0.0.0';
 
-const API_URL = process.env.API_URL || 'http://localhost:5000';
+const SERVER_URL = process.env.SERVER_URL || 'http://localhost:5000';
 
 const CLIENT_BUILD_PATH = path.join(__dirname, '../build');
 
-console.log('Proxied API URL:', API_URL);
+console.log('Proxied API URL:', SERVER_URL);
 
 // App
 const app = express();
 const apiProxy = httpProxy.createProxyServer({
   ws: true,
-  target: API_URL,
+  target: SERVER_URL,
 });
 
 // Static files - built React App
@@ -27,7 +27,7 @@ app.use(express.static(CLIENT_BUILD_PATH));
 app.all('/api/*', function (req, res) {
   console.log(req.method.toUpperCase(), req.path);
   req.url = req.url.replace('/api', '');
-  apiProxy.web(req, res, { target: API_URL });
+  apiProxy.web(req, res);
 });
 
 //redicrect SocketIO HTTP requests to API server (flask-socketio)

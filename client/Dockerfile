@@ -27,9 +27,9 @@ RUN yarn install --frozen-lockfile --prod
 
 COPY server/* /app/server/
 
-ARG EXPOSE_PORT=4123
+ARG CLIENT_PORT=4121
 
-ENV PORT ${EXPOSE_PORT}}
-EXPOSE ${EXPOSE_PORT}
+ENV CLIENT_PORT ${CLIENT_PORT}
+EXPOSE ${CLIENT_PORT}
 
 CMD [ "yarn", "start" ]

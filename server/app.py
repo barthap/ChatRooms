@@ -2,6 +2,7 @@ import logging
 from flask import Flask
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send
+import os
 
 
 app = Flask(__name__)                           # Create Flask instance
@@ -45,4 +46,6 @@ def handle_my_custom_event(json):
     emit('responses', json)
 
 if __name__ == '__main__':
-    socketio.run(app, host="0.0.0.0", port=5000, debug=True)
+    port = os.environ.get('SERVER_PORT', 5000)
+    print('Starting server at port' + str(port))
+    socketio.run(app, host="0.0.0.0", port=int(port), debug=True)

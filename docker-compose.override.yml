@@ -5,9 +5,13 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
+      args:
+        SERVER_PORT: ${SERVER_PORT:-5000}
   client:
     build:
       context: ./client
       dockerfile: Dockerfile
       args:
-        EXPOSE_PORT: 4123
+        CLIENT_PORT: ${CLIENT_PORT:-4121}
+    ports:
+      - "${CLIENT_PORT:-4121}:${CLIENT_PORT:-4121}"
