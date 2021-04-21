@@ -37,4 +37,8 @@ jobs:
           port: ${{ secrets.PORT }}
           envs: APP_DOMAIN,REGISTRY_NAME
           script_stop: true
-          script: /home/${{ secrets.USERNAME }}/chatrooms/deploy.sh
+          script: |
+            cd /home/${{ secrets.USERNAME }}/chatrooms
+            export APP_DOMAIN=$APP_DOMAIN
+            export REGISTRY_NAME=$REGISTRY_NAME
+            ./deploy.sh
