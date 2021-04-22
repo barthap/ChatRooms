@@ -23,7 +23,7 @@ jobs:
           PORT: ${{ secrets.PORT }}
           KEY: ${{ secrets.SSHKEY }}
         with:
-          source: "deploy.sh,docker-compose.yml,docker-compose.deployment.yml,.env"
+          source: "compose,deploy.sh,docker-compose.yml,docker-compose.prod.yml,.env"
           target: /home/${{ secrets.USERNAME }}/chatrooms
       - name: Execute deployment script
         uses: appleboy/ssh-action@master

@@ -12,10 +12,10 @@ echo "REGISTRY_NAME=$REGISTRY_NAME" >> .env
 
 # pull latest from registry
 echo "Pulling latest images..."
-docker-compose -f docker-compose.yml -f docker-compose.deployment.yml pull
+./compose pull
 
 # up -d
 echo "Deploying containers..."
-docker-compose -f docker-compose.yml -f docker-compose.deployment.yml up -d
+./compose up -d
 
 echo "Chat Rooms deployed successfully!"

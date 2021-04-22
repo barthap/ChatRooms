@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# A helper utility to shorten this long docker-compose command
+docker-compose -f docker-compose.yml -f docker-compose.prod.yml "$@"
