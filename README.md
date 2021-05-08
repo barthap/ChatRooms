@@ -48,7 +48,7 @@ To test server without worrying about running heavyweight React client, you can 
 
 - prepared for this purpose `server/browser_playground` HTML files - see [`README.md`](./server/browser_playground/README.md) in there.
 - Postman - for HTTP communication with Flask endpoints
-- [This awesome tool](https://amritb.github.io/socketio-client-tool/) - just enter `http://localhost:5000` and connect. You can communicate with server without writing any client-side code!
+- [This awesome tool](https://amritb.github.io/socketio-client-tool/) - just enter `ws://localhost:5000/chat` and connect. You can communicate with server without writing any client-side code! The `/chat` URI means that you are connecting to a `chat` Socket.IO namespace instead of default `/` namespace.
 
 #### Web Client
 
