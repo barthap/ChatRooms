@@ -3,7 +3,9 @@ from flask import Flask, request
 from flask_cors import CORS
 from flask_socketio import SocketIO, emit, send, Namespace
 import os
+import sys
 
+from users.router import users_router
 
 app = Flask(__name__)                           # Create Flask instance
 app.config['SECRET_KEY'] = 'ChatRoomsSecret'    # Change me
@@ -23,6 +25,8 @@ def health():
     Client can send `GET /api/health` to check if server is ready.
     """
     return 'OK'
+
+app.register_blueprint(users_router, url_prefix='/users')
 
 # listen to global event named "message"
 @socketio.on('message')
@@ -64,6 +68,12 @@ def handle_message(data):
     print('Received chat message in global namespace:', content)
     print('Did you forget to connect to a /chat namespace?')
 
+
+@socketio.on_error_default  # handles all namespaces without an explicit error handler
+def default_error_handler(e):
+    event = request.event['message']
+    print(f'Socket.IO Error during processing {event} message:', file=sys.stderr)
+    print(e, file=sys.stderr)
 
 class ChatNamespace(Namespace):
     def __init__(self, *args, **kwargs):
