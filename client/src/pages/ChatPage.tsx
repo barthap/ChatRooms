@@ -48,6 +48,8 @@ function renderMessage(key: string | number, msg: IMessage, selfSid?: string, la
   );
 }
 
+const WEBSOCKET_URL = process.env.REACT_APP_WS_URL || '';
+
 export default function ChatPage() {
   // Set initial message input value to empty string
   const [messageInputValue, setMessageInputValue] = useState('');
@@ -62,7 +64,7 @@ export default function ChatPage() {
   React.useEffect(() => {
     console.countReset('Render');
 
-    const socket = io('http://localhost:5000/chat');
+    const socket = io(`${WEBSOCKET_URL}/chat`);
     socket.on('connect', () => {
       console.log('Connected to /chat with sid', socket.id);
       setSid(socket.id);
