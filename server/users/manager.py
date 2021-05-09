@@ -1,6 +1,6 @@
 from typing import Dict, Union
 from users.user import User
-from errors.user import UserAlreadyExistsError
+from errors.user import UserAlreadyExistsError, UserNotFoundError
 
 
 class UserManager:
@@ -29,9 +29,10 @@ class UserManager:
 
   def delete_user(self, user_id: str):
     if user_id in self.users:
+      print(f'Deleting {self.users[user_id]}')
       del self.users[user_id]
     else:
-      raise Exception(f"Cannot delete user with id {user_id} because it doesnt exist already")
+      raise UserNotFoundError(f"Cannot delete user with id {user_id} because it doesnt exist already")
 
 
 user_manager = UserManager()

@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 
 from users.manager import user_manager
-from errors.user import UserAlreadyExistsError
+from errors.user import UserAlreadyExistsError, UserNotFoundError
 
 users_router = Blueprint('users_router', __name__)
 
@@ -40,8 +40,26 @@ def create_user():
   return jsonify(user.to_dict()), 201
 
 
+@users_router.route('/<user_id>', methods=['DELETE'])
+def delete_user(user_id):
+  id_to_delete = request.view_args.get('user_id')
+  if id_to_delete == None:
+    return 'Invalid delete request', 400
+
+  user_manager.delete_user(id_to_delete)
+
+  return jsonify({'deleted':True}), 204
+
+### Error handlers
+
 @users_router.errorhandler(UserAlreadyExistsError)
 def handle_username_already_exists(error):
+  response = jsonify(error.to_dict())
+  response.status_code = error.status_code
+  return response
+
+@users_router.errorhandler(UserNotFoundError)
+def handle_user_not_found(error):
   response = jsonify(error.to_dict())
   response.status_code = error.status_code
   return response

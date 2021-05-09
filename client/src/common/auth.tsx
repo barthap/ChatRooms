@@ -21,6 +21,16 @@ async function createUser(username: string): Promise<IUser> {
   throw new Error(body.message ?? 'unknown error: ' + JSON.stringify(body));
 }
 
+async function deleteUser(userId: string): Promise<void> {
+  const response = await fetch(`${API_URL}/users/${userId}`, {
+    method: 'DELETE',
+  });
+
+  if (response.status !== 204) {
+    throw new Error('Error when deleting user: ' + (await response.text()));
+  }
+}
+
 interface IAuth {
   user: IUser | null;
   isAuthenticated: boolean;
@@ -53,6 +63,7 @@ function useProvideAuth() {
   };
 
   const signOut = async () => {
+    user && (await deleteUser(user.id));
     setUser(null);
   };
 
