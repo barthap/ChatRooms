@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react';
 
-const API_URL = process.env.REACT_APP_API_URL || '/api';
+import { API_URL } from '../others/constants';
 
 export default function ApiComponent() {
   const [status, setStatus] = useState('loading...');
-
-  // console.warn('api', API_URL);
-  // console.warn('ws', process.env.REACT_APP_WS_URL);
 
   const fetchServer = async () => {
     try {

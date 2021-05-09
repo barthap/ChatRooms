@@ -16,21 +16,52 @@ import {
 } from '@chatscope/chat-ui-kit-react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { io, Socket } from 'socket.io-client';
 
 import ApiComponent from '../components/ApiComponent';
 import ConversationSidebar from '../components/ConversationSidebar';
+import { useAuth } from '../others/auth';
+import { groupAvatarUrl2, userAvatarUrl } from '../others/avatars';
+import { WEBSOCKET_URL } from '../others/constants';
+import { IUser } from '../others/user';
 
 interface IMessage {
   sender_sid: string;
   content: string;
+  sender: IUser;
 }
 
-function renderMessage(key: string | number, msg: IMessage, selfSid?: string, lastSid?: string) {
-  const isSelf = msg.sender_sid === selfSid;
-  const isSameSenderAsLast = msg.sender_sid === lastSid;
-  const shouldRenderAvatar = !isSelf && !isSameSenderAsLast;
-  const avatarUrl = `https://identicon-api.herokuapp.com/${msg.sender_sid}/50?format=png`;
+function renderMessages(messages: IMessage[], sender?: IUser | null) {
+  const count = messages.length;
+  return messages.map((msg, idx, arr) => {
+    const isFirst = idx === 0;
+    const isLast = idx === count - 1;
+
+    const prev = isFirst ? undefined : arr[idx - 1];
+    const next = isLast ? undefined : arr[idx + 1];
+
+    const isUserFirst = isFirst || msg.sender.id !== prev?.sender.id;
+    const isUserLast = isLast || msg.sender.id !== next?.sender.id;
+
+    const isSelf = msg.sender.id === sender?.id;
+
+    return renderMessage(idx, msg, isSelf, isUserFirst, isUserLast);
+  });
+}
+
+function renderMessage(
+  key: string | number,
+  msg: IMessage,
+  isSelf: boolean,
+  isUserFirst: boolean,
+  isUserLast: boolean
+) {
+  const shouldRenderAvatar = !isSelf && isUserFirst;
+  const avatarUrl = userAvatarUrl(msg.sender_sid);
+
+  const position =
+    isUserFirst && isUserLast ? 'single' : isUserFirst ? 'first' : isUserLast ? 'last' : 'normal';
 
   return (
     <Message
@@ -40,19 +71,16 @@ function renderMessage(key: string | number, msg: IMessage, selfSid?: string, la
         sentTime: '15 mins ago',
         sender: msg.sender_sid,
         direction: isSelf ? 'outgoing' : 'incoming',
-        position: isSameSenderAsLast ? 'normal' : 'first',
+        position,
       }}
-      avatarSpacer={isSameSenderAsLast && !isSelf}>
+      avatarSpacer={!isUserFirst && !isSelf}>
+      {isUserFirst && <Message.Header sender={msg.sender.name} />}
       {shouldRenderAvatar && <Avatar src={avatarUrl} name="Zoe" />}
     </Message>
   );
 }
 
-const WEBSOCKET_URL = process.env.REACT_APP_WS_URL || '';
-
 export default function ChatPage() {
-  // Set initial message input value to empty string
-  const [messageInputValue, setMessageInputValue] = useState('');
   const [sid, setSid] = useState<string | null>(null);
 
   const [socket, setSocket] = useState<Socket | undefined>();
@@ -61,10 +89,18 @@ export default function ChatPage() {
 
   console.count('Render');
 
+  const auth = useAuth();
+  const history = useHistory();
+
   React.useEffect(() => {
     console.countReset('Render');
 
-    const socket = io(`${WEBSOCKET_URL}/chat`);
+    const socket = io(`${WEBSOCKET_URL}/chat`, {
+      autoConnect: false,
+      extraHeaders: {
+        'x-user-id': auth?.user?.id ?? '',
+      },
+    });
     socket.on('connect', () => {
       console.log('Connected to /chat with sid', socket.id);
       setSid(socket.id);
@@ -72,25 +108,36 @@ export default function ChatPage() {
     socket.on('disconnect', () => {
       console.log('Disconnected');
     });
+    socket.on('connect_error', err => {
+      if (err instanceof Error) {
+        if (err.message === 'invalid_user_id') {
+          console.warn('User ID is invalid, redirecting to login');
+          history.push('/login');
+        }
+      } else {
+        console.warn(err);
+      }
+    });
 
     socket.on('chat_message', (msg: IMessage) => {
       console.log('Received message:', msg);
       setMessages(oldMsgs => [...oldMsgs, msg]);
     });
 
+    socket.connect();
+
     setSocket(socket);
 
     return () => {
       setSid(null);
       setSocket(undefined);
-      socket.disconnect();
+      socket?.disconnect();
       console.log('Disconnecting from socket...');
     };
   }, []);
 
   const sendMessage = (text: string) => {
     socket?.emit('send_message', { content: text });
-    setMessageInputValue('');
   };
 
   return (
@@ -104,32 +151,20 @@ export default function ChatPage() {
         <ChatContainer>
           <ConversationHeader>
             <ConversationHeader.Back />
-            <Avatar src="https://i.pravatar.cc/100?a=9" name="Zoe" />
-            <ConversationHeader.Content userName="Zoe" info="Active 10 mins ago" />
+            <Avatar src={groupAvatarUrl2('Default Room')} name="Zoe" />
+            <ConversationHeader.Content userName="Default Room" info="Active 0 mins ago" />
             <ConversationHeader.Actions>
               <VoiceCallButton />
               <VideoCallButton />
               <InfoButton />
             </ConversationHeader.Actions>
           </ConversationHeader>
-          <MessageList typingIndicator={<TypingIndicator content="Zoe is typing" />}>
+          <MessageList typingIndicator={<TypingIndicator content="Nobody is typing" />}>
             <MessageSeparator content="Your conversation starts here." />
 
-            {messages.map((msg, idx, msgs) =>
-              renderMessage(
-                idx,
-                msg,
-                sid ?? undefined,
-                idx > 0 ? msgs[idx - 1].sender_sid : undefined
-              )
-            )}
+            {renderMessages(messages, auth?.user)}
           </MessageList>
-          <MessageInput
-            placeholder="Type message here"
-            value={messageInputValue}
-            onChange={(val: string) => setMessageInputValue(val)}
-            onSend={sendMessage}
-          />
+          <MessageInput placeholder="Type message here" onSend={sendMessage} />
         </ChatContainer>
 
         <Sidebar position="right">
@@ -139,6 +174,8 @@ export default function ChatPage() {
           <ExpansionPanel open title="DEBUG INFO">
             <ApiComponent />
             <p>Your SID: {sid}</p>
+            <p>Your username: {auth?.user?.name}</p>
+            <p>Your user ID: {auth?.user?.id}</p>
           </ExpansionPanel>
           <ExpansionPanel title="OPTIONS">
             <p>Lorem ipsum</p>
@@ -151,125 +188,3 @@ export default function ChatPage() {
     </div>
   );
 }
-
-/*
-            <Message
-              model={{
-                message: 'Hello my friend',
-                sentTime: '15 mins ago',
-                sender: 'Zoe',
-                direction: 'incoming',
-                position: 'single',
-              }}>
-              <Avatar src="https://i.pravatar.cc/100?a=9" name="Zoe" />
-            </Message>
-
-            <Message
-              model={{
-                message: 'Hello my friend',
-                sentTime: '15 mins ago',
-                sender: 'Patrik',
-                direction: 'outgoing',
-                position: 'single',
-              }}
-              avatarSpacer
-            />
-            <Message
-              model={{
-                message: 'Hello my friend',
-                sentTime: '15 mins ago',
-                sender: 'Zoe',
-                direction: 'incoming',
-                position: 'first',
-              }}
-              avatarSpacer
-            />
-            <Message
-              model={{
-                message: 'Hello my friend',
-                sentTime: '15 mins ago',
-                sender: 'Zoe',
-                direction: 'incoming',
-                position: 'normal',
-              }}
-              avatarSpacer
-            />
-            <Message
-              model={{
-                message: 'Hello my friend',
-                sentTime: '15 mins ago',
-                sender: 'Zoe',
-                direction: 'incoming',
-                position: 'normal',
-              }}
-              avatarSpacer
-            />
-            <Message
-              model={{
-                message: 'Hello my friend',
-                sentTime: '15 mins ago',
-                sender: 'Zoe',
-                direction: 'incoming',
-                position: 'last',
-              }}>
-              <Avatar src="https://i.pravatar.cc/100?a=9" name="Zoe" />
-            </Message>
-
-            <Message
-              model={{
-                message: 'Hello my friend',
-                sentTime: '15 mins ago',
-                sender: 'Patrik',
-                direction: 'outgoing',
-                position: 'first',
-              }}
-            />
-            <Message
-              model={{
-                message: 'Hello my friend',
-                sentTime: '15 mins ago',
-                sender: 'Patrik',
-                direction: 'outgoing',
-                position: 'normal',
-              }}
-            />
-            <Message
-              model={{
-                message: 'Hello my friend',
-                sentTime: '15 mins ago',
-                sender: 'Patrik',
-                direction: 'outgoing',
-                position: 'normal',
-              }}
-            />
-            <Message
-              model={{
-                message: 'Hello my friend',
-                sentTime: '15 mins ago',
-                sender: 'Patrik',
-                direction: 'outgoing',
-                position: 'last',
-              }}
-            />
-
-            <Message
-              model={{
-                message: 'Hello my friend',
-                sentTime: '15 mins ago',
-                sender: 'Zoe',
-                direction: 'incoming',
-                position: 'first',
-              }}
-              avatarSpacer
-            />
-            <Message
-              model={{
-                message: 'Hello my friend',
-                sentTime: '15 mins ago',
-                sender: 'Zoe',
-                direction: 'incoming',
-                position: 'last',
-              }}>
-              <Avatar src="https://i.pravatar.cc/100?a=9" name="Zoe" />
-            </Message>
-            */

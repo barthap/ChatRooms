@@ -21,7 +21,7 @@ class UserManager:
 
   def create_user(self, name: str, session_id: str=None) -> User:
     if self.name_exists(name):
-      raise UserAlreadyExistsError(f"User with name {name} already exists!", payload={'username': name})
+      raise UserAlreadyExistsError(payload={'username': name})
 
     user = User(name, session_id)
     self.users[user.id] = user

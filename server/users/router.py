@@ -35,6 +35,7 @@ def create_user():
     return 'No username field in request body', 400
 
   user = user_manager.create_user(data['username'])
+  print(f'Created user: {user}')
   
   return jsonify(user.to_dict()), 201
 

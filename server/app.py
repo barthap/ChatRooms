@@ -1,11 +1,13 @@
 import logging
 from flask import Flask, request
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit, send, Namespace
+from flask_socketio import SocketIO, emit, send
 import os
 import sys
 
+from chat.namespace import ChatNamespace
 from users.router import users_router
+from errors.auth import InvalidUserIdError
 
 app = Flask(__name__)                           # Create Flask instance
 app.config['SECRET_KEY'] = 'ChatRoomsSecret'    # Change me
@@ -28,27 +30,6 @@ def health():
 
 app.register_blueprint(users_router, url_prefix='/users')
 
-# listen to global event named "message"
-@socketio.on('message')
-def handle_message(data):
-    print('received message: ' + data)
-
-# listen to events named json
-@socketio.on('json')
-def handle_json(json):
-    print('received json: ' + str(json))
-
-# listen to events named "my event"
-@socketio.on('my event')
-def handle_my_custom_event(json):
-    print('received my event: ' + str(json))
-
-    # this sends information to global "message" event
-    send('received my event: ' + str(json))
-
-    # this emits event with name "responses"
-    emit('responses', json)
-
 
 ################################################
 
@@ -61,7 +42,6 @@ def test_connect(**kwargs):
 def test_disconnect(**kwargs):
     print(f'Client with sid: {request.sid} disconnected from global namespace')
 
-
 @socketio.on('send_message')
 def handle_message(data):
     content = data['content']
@@ -69,36 +49,21 @@ def handle_message(data):
     print('Did you forget to connect to a /chat namespace?')
 
 
-@socketio.on_error_default  # handles all namespaces without an explicit error handler
+# handles all namespaces without an explicit error handler
+@socketio.on_error_default
 def default_error_handler(e):
+    if isinstance(e, InvalidUserIdError):
+        print('Invalid user ID')
+        raise e
+
     event = request.event['message']
     print(f'Socket.IO Error during processing {event} message:', file=sys.stderr)
     print(e, file=sys.stderr)
 
-class ChatNamespace(Namespace):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.sessions = {}
-
-    def on_connect(self, **kwargs):
-        sid = request.sid
-        self.sessions[sid] = {'username': None}
-        print(f'Client with sid: {sid} connected to chat!')
-
-    def on_disconnect(self, **kwargs):
-        del self.sessions[request.sid]
-        print(f'Client with sid: {request.sid} disconnected from chat!')
-
-    # @socketio.on('send_message`)
-    def on_send_message(self, data):
-        content = data['content']
-        print('Received chat message:', content)
-        data['sender_sid'] = request.sid
-        # Change `broadcast=True` to `to="room_name_here"`
-        emit('chat_message', data, broadcast=True)
-
+# Register the /chat socket.io namespace
 socketio.on_namespace(ChatNamespace('/chat'))
 
+# main
 if __name__ == '__main__':
     port = os.environ.get('SERVER_PORT', 5000)
     print('Starting server at port ' + str(port))
