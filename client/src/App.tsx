@@ -1,25 +1,30 @@
 import React from 'react';
-
-import ApiComponent from './components/ApiComponent';
-import logo from './logo.svg';
 import './App.css';
+import { Route, BrowserRouter as Router, Redirect } from 'react-router-dom';
+
+import { useAuth } from './common/auth';
+import PrivateRoute from './components/PrivateRoute';
+import ChatPage from './pages/ChatPage';
+import LoginPage from './pages/LoginPage';
 
 function App() {
+  const auth = useAuth();
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>Hello World</p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer">
-          Learn React
-        </a>
-        <ApiComponent />
-      </header>
-    </div>
+    <Router>
+      <Route
+        exact
+        path="/"
+        render={() =>
+          auth?.isAuthenticated ? <Redirect to="/chatrooms" /> : <Redirect to="/login" />
+        }
+      />
+      <Route path="/login">
+        <LoginPage />
+      </Route>
+      <PrivateRoute path="/chatrooms">
+        <ChatPage />
+      </PrivateRoute>
+    </Router>
   );
 }
 

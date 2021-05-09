@@ -10,6 +10,8 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 
+import { groupAvatarUrl2 } from '../common/avatars';
+
 export default function ConversationSidebar() {
   return (
     <Sidebar position="left" scrollable={false}>
@@ -18,11 +20,11 @@ export default function ConversationSidebar() {
       </Button>
       <ConversationList>
         <Conversation name="Lilly" lastSenderName="Lilly" info="Yes i can do it for you">
-          <Avatar src="https://i.pravatar.cc/100?a=1" name="Lilly" status="available" />
+          <Avatar src={groupAvatarUrl2('Lilly')} name="Lilly" status="available" />
         </Conversation>
 
         <Conversation name="Joe" lastSenderName="Joe" info="Yes i can do it for you">
-          <Avatar src="https://i.pravatar.cc/100?a=2" name="Joe" status="dnd" />
+          <Avatar src={groupAvatarUrl2('Joe')} name="Joe" status="dnd" />
         </Conversation>
 
         <Conversation
@@ -30,27 +32,27 @@ export default function ConversationSidebar() {
           lastSenderName="Emily"
           info="Yes i can do it for you"
           unreadCnt={3}>
-          <Avatar src="https://i.pravatar.cc/100?aa=3" name="Emily" status="available" />
+          <Avatar src={groupAvatarUrl2('Emily')} name="Emily" status="available" />
         </Conversation>
 
         <Conversation name="Kai" lastSenderName="Kai" info="Yes i can do it for you" unreadDot>
-          <Avatar src="https://i.pravatar.cc/100?a=4" name="Kai" status="unavailable" />
+          <Avatar src={groupAvatarUrl2('Kai')} name="Kai" status="unavailable" />
         </Conversation>
 
         <Conversation name="Akane" lastSenderName="Akane" info="Yes i can do it for you">
-          <Avatar src="https://i.pravatar.cc/100?a=5" name="Akane" status="eager" />
+          <Avatar src={groupAvatarUrl2('Akane')} name="Akane" status="eager" />
         </Conversation>
 
         <Conversation name="Eliot" lastSenderName="Eliot" info="Yes i can do it for you">
-          <Avatar src="https://i.pravatar.cc/100?a=6" name="Eliot" status="away" />
+          <Avatar src={groupAvatarUrl2('Eliot')} name="Eliot" status="away" />
         </Conversation>
 
         <Conversation name="Zoe" lastSenderName="Zoe" info="Yes i can do it for you" active>
-          <Avatar src="https://i.pravatar.cc/100?a=9" name="Zoe" status="dnd" />
+          <Avatar src={groupAvatarUrl2('Zoe')} name="Zoe" status="dnd" />
         </Conversation>
 
         <Conversation name="Patrik" lastSenderName="Patrik" info="Yes i can do it for you">
-          <Avatar src="https://i.pravatar.cc/100?a=8" name="Patrik" status="invisible" />
+          <Avatar src={groupAvatarUrl2('Patrik')} name="Patrik" status="invisible" />
         </Conversation>
       </ConversationList>
     </Sidebar>

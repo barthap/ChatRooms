@@ -1,0 +1,144 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<LoginForm /> renders form snapshot without error message 1`] = `
+Object {
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <form>
+        <h3>
+          Sign In
+        </h3>
+        <div
+          class="form-group row mb-3"
+        >
+          <label
+            class="col-sm-3 col-form-label"
+            for="nickname"
+          >
+            Nickname:
+          </label>
+          <div
+            class="col-sm-9"
+          >
+            <input
+              class="form-control"
+              id="nickname"
+              name="nickname"
+              placeholder="Enter your nickname"
+              type="text"
+              value=""
+            />
+          </div>
+        </div>
+        <div
+          class="d-flex justify-content-between"
+        >
+          <p
+            class="text-danger"
+          />
+          <button
+            class="btn btn-primary"
+            type="submit"
+          >
+            Enter chat
+          </button>
+        </div>
+      </form>
+    </div>
+  </body>,
+  "container": <div>
+    <form>
+      <h3>
+        Sign In
+      </h3>
+      <div
+        class="form-group row mb-3"
+      >
+        <label
+          class="col-sm-3 col-form-label"
+          for="nickname"
+        >
+          Nickname:
+        </label>
+        <div
+          class="col-sm-9"
+        >
+          <input
+            class="form-control"
+            id="nickname"
+            name="nickname"
+            placeholder="Enter your nickname"
+            type="text"
+            value=""
+          />
+        </div>
+      </div>
+      <div
+        class="d-flex justify-content-between"
+      >
+        <p
+          class="text-danger"
+        />
+        <button
+          class="btn btn-primary"
+          type="submit"
+        >
+          Enter chat
+        </button>
+      </div>
+    </form>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;
