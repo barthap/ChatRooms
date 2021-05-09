@@ -2,7 +2,6 @@ import {
   MainContainer,
   ChatContainer,
   MessageList,
-  Message,
   MessageInput,
   Sidebar,
   Avatar,
@@ -15,75 +14,22 @@ import {
   MessageSeparator,
 } from '@chatscope/chat-ui-kit-react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { io, Socket } from 'socket.io-client';
 
+import { useAuth } from '../common/auth';
+import { groupAvatarUrl2 } from '../common/avatars';
+import { IMessage } from '../common/message';
+import { ChatSocketManager } from '../common/socket';
 import ApiComponent from '../components/ApiComponent';
 import ConversationSidebar from '../components/ConversationSidebar';
-import { useAuth } from '../others/auth';
-import { groupAvatarUrl2, userAvatarUrl } from '../others/avatars';
-import { WEBSOCKET_URL } from '../others/constants';
-import { IUser } from '../others/user';
-
-interface IMessage {
-  sender_sid: string;
-  content: string;
-  sender: IUser;
-}
-
-function renderMessages(messages: IMessage[], sender?: IUser | null) {
-  const count = messages.length;
-  return messages.map((msg, idx, arr) => {
-    const isFirst = idx === 0;
-    const isLast = idx === count - 1;
-
-    const prev = isFirst ? undefined : arr[idx - 1];
-    const next = isLast ? undefined : arr[idx + 1];
-
-    const isUserFirst = isFirst || msg.sender.id !== prev?.sender.id;
-    const isUserLast = isLast || msg.sender.id !== next?.sender.id;
-
-    const isSelf = msg.sender.id === sender?.id;
-
-    return renderMessage(idx, msg, isSelf, isUserFirst, isUserLast);
-  });
-}
-
-function renderMessage(
-  key: string | number,
-  msg: IMessage,
-  isSelf: boolean,
-  isUserFirst: boolean,
-  isUserLast: boolean
-) {
-  const shouldRenderAvatar = !isSelf && isUserFirst;
-  const avatarUrl = userAvatarUrl(msg.sender_sid);
-
-  const position =
-    isUserFirst && isUserLast ? 'single' : isUserFirst ? 'first' : isUserLast ? 'last' : 'normal';
-
-  return (
-    <Message
-      key={key}
-      model={{
-        message: msg.content,
-        sentTime: '15 mins ago',
-        sender: msg.sender_sid,
-        direction: isSelf ? 'outgoing' : 'incoming',
-        position,
-      }}
-      avatarSpacer={!isUserFirst && !isSelf}>
-      {isUserFirst && <Message.Header sender={msg.sender.name} />}
-      {shouldRenderAvatar && <Avatar src={avatarUrl} name="Zoe" />}
-    </Message>
-  );
-}
+import { renderMessages } from '../components/Messages';
 
 export default function ChatPage() {
   const [sid, setSid] = useState<string | null>(null);
 
-  const [socket, setSocket] = useState<Socket | undefined>();
+  const [socket, setSocket] = useState<ChatSocketManager | undefined>();
 
   const [messages, setMessages] = useState<IMessage[]>([]);
 
@@ -95,49 +41,39 @@ export default function ChatPage() {
   React.useEffect(() => {
     console.countReset('Render');
 
-    const socket = io(`${WEBSOCKET_URL}/chat`, {
-      autoConnect: false,
-      extraHeaders: {
-        'x-user-id': auth?.user?.id ?? '',
-      },
+    const manager = new ChatSocketManager({
+      authUser: auth?.user,
     });
-    socket.on('connect', () => {
-      console.log('Connected to /chat with sid', socket.id);
-      setSid(socket.id);
+
+    manager.onConnectHandlers.addListener(sid => {
+      setSid(sid);
     });
-    socket.on('disconnect', () => {
-      console.log('Disconnected');
-    });
-    socket.on('connect_error', err => {
-      if (err instanceof Error) {
-        if (err.message === 'invalid_user_id') {
-          console.warn('User ID is invalid, redirecting to login');
-          history.push('/login');
-        }
+    manager.onConnectionErrorHandlers.addListener(err => {
+      if (err.message === 'invalid_user_id') {
+        console.warn('User ID is invalid, redirecting to login');
+        history.push('/login');
       } else {
         console.warn(err);
       }
     });
-
-    socket.on('chat_message', (msg: IMessage) => {
-      console.log('Received message:', msg);
+    manager.onChatMessageHandlers.addListener(msg => {
       setMessages(oldMsgs => [...oldMsgs, msg]);
     });
 
-    socket.connect();
-
-    setSocket(socket);
+    manager.connect();
+    setSocket(manager);
 
     return () => {
+      manager.disconnect();
+      manager.clearAllEventHandlers();
       setSid(null);
       setSocket(undefined);
-      socket?.disconnect();
-      console.log('Disconnecting from socket...');
+      console.log('Removed manager instance');
     };
   }, []);
 
   const sendMessage = (text: string) => {
-    socket?.emit('send_message', { content: text });
+    socket?.sendMessage({ content: text });
   };
 
   return (
@@ -170,6 +106,9 @@ export default function ChatPage() {
         <Sidebar position="right">
           <ExpansionPanel open title="INFO">
             <p>Hello World</p>
+            <p>
+              You are logged in as <b>{auth?.user?.name}</b>
+            </p>
           </ExpansionPanel>
           <ExpansionPanel open title="DEBUG INFO">
             <ApiComponent />
@@ -182,6 +121,9 @@ export default function ChatPage() {
             <p>Lorem ipsum</p>
             <p>Lorem ipsum</p>
             <p>Lorem ipsum</p>
+            <button className="btn btn-primary" onClick={() => auth?.signOut()}>
+              Logout
+            </button>
           </ExpansionPanel>
         </Sidebar>
       </MainContainer>

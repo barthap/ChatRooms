@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-import { API_URL } from '../others/constants';
+import { API_URL } from '../common/constants';
 
 export default function ApiComponent() {
   const [status, setStatus] = useState('loading...');

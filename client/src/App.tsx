@@ -2,8 +2,8 @@ import React from 'react';
 import './App.css';
 import { Route, BrowserRouter as Router, Redirect } from 'react-router-dom';
 
+import { useAuth } from './common/auth';
 import PrivateRoute from './components/PrivateRoute';
-import { useAuth } from './others/auth';
 import ChatPage from './pages/ChatPage';
 import LoginPage from './pages/LoginPage';
 

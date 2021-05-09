@@ -3,8 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './login.css';
 import { useHistory, useLocation } from 'react-router-dom';
 
+import { useAuth } from '../common/auth';
 import LoginForm from '../components/LoginForm';
-import { useAuth } from '../others/auth';
 
 export default function LoginPage() {
   const history = useHistory();

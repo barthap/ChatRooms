@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 
 import App from './App';
 import './index.css';
-import { ProvideAuth } from './others/auth';
+import { ProvideAuth } from './common/auth';
 import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(

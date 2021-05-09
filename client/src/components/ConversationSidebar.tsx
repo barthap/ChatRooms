@@ -10,7 +10,7 @@ import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 
-import { groupAvatarUrl2 } from '../others/avatars';
+import { groupAvatarUrl2 } from '../common/avatars';
 
 export default function ConversationSidebar() {
   return (

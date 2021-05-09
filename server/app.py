@@ -5,7 +5,7 @@ from flask_socketio import SocketIO, emit, send
 import os
 import sys
 
-from chat.namespace import ChatNamespace
+from chat.main import ChatNamespace
 from users.router import users_router
 from errors.auth import InvalidUserIdError
 
