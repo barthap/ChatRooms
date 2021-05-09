@@ -1,7 +1,12 @@
 from typing import Dict, Union
+from datetime import datetime
+
 from users.user import User
 from errors.user import UserAlreadyExistsError, UserNotFoundError
 from logger import logger as log
+
+
+EXPIRE_TIME = 60 # 60 seconds
 
 class UserManager:
   def __init__(self):
@@ -19,9 +24,23 @@ class UserManager:
     except:
       return None
 
+  def is_expired(self, user_id: str) -> bool:
+    user = self.by_id(user_id)
+    if user == None:
+      return False
+    now = int(datetime.now().timestamp())
+    disconnected_time = user.meta['disconnected_at'] if 'disconnected_at' in user.meta else 0
+    log.warn(f'{now} - {disconnected_time}')
+    return user.session_id == None and (now - disconnected_time) > EXPIRE_TIME
+
   def create_user(self, name: str, session_id: str=None) -> User:
     if self.name_exists(name):
-      raise UserAlreadyExistsError(payload={'username': name})
+      usr = self.by_name(name)
+      if self.is_expired(usr.id):
+        log.debug(f'User {name} exists, but its expired, removing')
+        self.delete_user(usr.id)
+      else:
+        raise UserAlreadyExistsError(payload={'username': name})
 
     user = User(name, session_id)
     self.users[user.id] = user

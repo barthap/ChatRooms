@@ -1,6 +1,7 @@
 from flask_socketio import Namespace, emit
 from flask import request
 import shortuuid
+from datetime import datetime
 
 from logger import logger as log
 from users.manager import user_manager
@@ -27,6 +28,8 @@ class ChatNamespace(Namespace):
       sid = request.sid
       if sid in self.sessions:
         user = self.sessions[sid]
+        user.session_id = None
+        user.meta['disconnected_at'] = int(datetime.now().timestamp())
 
         del self.sessions[sid]
         # user_manager.delete_user(user.id)

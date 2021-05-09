@@ -1,10 +1,14 @@
 import shortuuid
+from datetime import datetime
 
 class User(object):
   def __init__(self, name: str, session_id: str=None):
     self.id = shortuuid.random(length=5)
     self.name = name
     self.session_id = session_id
+    self.meta = {
+      'created_at': int(datetime.now().timestamp())
+    }
 
   def to_dict(self):
     return {
