@@ -43,7 +43,7 @@ class ChatNamespace(Namespace):
         sid = request.sid
         sender = self.sessions[sid]
         content = data['content']
-        data['id'] = shortuuid.random(length=8)
+        data['id'] = shortuuid.random(length=10)
         data['sender'] = sender.to_dict()
 
         log.debug(f'[msg from {sender}]: {content}')
