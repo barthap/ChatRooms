@@ -30,7 +30,6 @@ class UserManager:
       return False
     now = int(datetime.now().timestamp())
     disconnected_time = user.meta['disconnected_at'] if 'disconnected_at' in user.meta else 0
-    log.warn(f'{now} - {disconnected_time}')
     return user.session_id == None and (now - disconnected_time) > EXPIRE_TIME
 
   def create_user(self, name: str, session_id: str=None) -> User:
