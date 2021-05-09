@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 
+from logger import logger as log
 from users.manager import user_manager
 from errors.user import UserAlreadyExistsError, UserNotFoundError
 
@@ -35,7 +36,7 @@ def create_user():
     return 'No username field in request body', 400
 
   user = user_manager.create_user(data['username'])
-  print(f'Created user: {user}')
+  log.info(f'Created user: {user}')
   
   return jsonify(user.to_dict()), 201
 

@@ -13,7 +13,6 @@ export default function LoginForm({ onSubmit, errorMessage }: Props = {}) {
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = event => {
     event.preventDefault();
     onSubmit && onSubmit(nickname);
-    console.log(nickname);
   };
 
   return (

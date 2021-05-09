@@ -2,6 +2,7 @@ from flask_socketio import Namespace, emit
 from flask import request
 import shortuuid
 
+from logger import logger as log
 from users.manager import user_manager
 from errors.auth import InvalidUserIdError
 
@@ -20,7 +21,7 @@ class ChatNamespace(Namespace):
         sid = request.sid
         user.session_id = sid
         self.sessions[sid] = user
-        print(f'{user} connected to chat (sid={sid})')
+        log.info(f'{user} connected to chat (sid={sid})')
 
     def on_disconnect(self, **kwargs):
       sid = request.sid
@@ -30,15 +31,19 @@ class ChatNamespace(Namespace):
         del self.sessions[sid]
         # user_manager.delete_user(user.id)
 
-        print(f'{user} disconnected from chat (sid={sid})')
+        log.info(f'{user} disconnected from chat (sid={sid})')
       else:
-        print(f'Disconnected invalid session sid={sid}')
+        log.warn(f'Disconnected invalid session sid={sid}')
 
     # @socketio.on('send_message`)
     def on_send_message(self, data):
+        sid = request.sid
+        sender = self.sessions[sid]
         content = data['content']
-        print('Received chat message:', content)
         data['id'] = shortuuid.random(length=8)
-        data['sender'] = self.sessions[request.sid].to_dict()
+        data['sender'] = sender.to_dict()
+
+        log.debug(f'[msg from {sender}]: {content}')
+
         # Change `broadcast=True` to `to="room_name_here"`
         emit('chat_message', data, broadcast=True)
