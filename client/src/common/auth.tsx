@@ -1,4 +1,5 @@
-import React, { useContext, createContext, useState } from 'react';
+import React, { useContext, createContext } from 'react';
+import { useCookies } from 'react-cookie';
 
 import { API_URL } from './constants';
 import { IUser } from './user';
@@ -36,6 +37,7 @@ interface IAuth {
   isAuthenticated: boolean;
   signIn: (username: string) => Promise<IUser>;
   signOut: () => Promise<void>;
+  invalidateSession: () => void;
 }
 
 /** For more details on
@@ -53,18 +55,25 @@ export function useAuth() {
   return useContext(authContext);
 }
 
-function useProvideAuth() {
-  const [user, setUser] = useState<IUser | null>(null);
+function useProvideAuth(): IAuth {
+  const [cookies, setCookie, removeCookie] = useCookies(['user']);
+  const user: IUser | null = cookies.user ?? null;
+
+  console.log('hook', user);
 
   const signIn = async (username: string) => {
     const user = await createUser(username);
-    setUser(user);
+    setCookie('user', user, { maxAge: 24 * 60 * 60 });
     return user;
   };
 
   const signOut = async () => {
+    invalidateSession();
     user && (await deleteUser(user.id));
-    setUser(null);
+  };
+
+  const invalidateSession = () => {
+    removeCookie('user');
   };
 
   return {
@@ -72,5 +81,6 @@ function useProvideAuth() {
     user,
     signIn,
     signOut,
+    invalidateSession,
   };
 }

@@ -24,6 +24,7 @@ import { IMessage } from '../common/message';
 import { ChatSocketManager } from '../common/socket';
 import ApiComponent from '../components/ApiComponent';
 import ConversationSidebar from '../components/ConversationSidebar';
+import CookieInfo from '../components/CookieInfo';
 import { renderMessages } from '../components/Messages';
 
 export default function ChatPage() {
@@ -51,6 +52,7 @@ export default function ChatPage() {
     manager.onConnectionErrorHandlers.addListener(err => {
       if (err.message === 'invalid_user_id') {
         console.warn('User ID is invalid, redirecting to login');
+        auth?.invalidateSession();
         history.push('/login');
       } else {
         console.warn(err);
@@ -105,10 +107,10 @@ export default function ChatPage() {
 
         <Sidebar position="right">
           <ExpansionPanel open title="INFO">
-            <p>Hello World</p>
             <p>
               You are logged in as <b>{auth?.user?.name}</b>
             </p>
+            <CookieInfo />
           </ExpansionPanel>
           <ExpansionPanel open title="DEBUG INFO">
             <ApiComponent />

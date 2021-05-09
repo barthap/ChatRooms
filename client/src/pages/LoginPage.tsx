@@ -1,7 +1,7 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './login.css';
-import { useHistory, useLocation } from 'react-router-dom';
+import { Redirect, useHistory, useLocation } from 'react-router-dom';
 
 import { useAuth } from '../common/auth';
 import LoginForm from '../components/LoginForm';
@@ -31,6 +31,10 @@ export default function LoginPage() {
       }
     }
   };
+
+  if (auth?.isAuthenticated) {
+    return <Redirect to="/chatrooms" />;
+  }
 
   return (
     <div className="auth-wrapper">
