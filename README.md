@@ -20,7 +20,7 @@ cd server
 pip3 install -r requirements.txt
 ```
 
-> **IMPORTANT NOTE:** Remember to update `requirements.txt` every time you add a new dependency!
+> **IMPORTANT NOTE:** Remember to update `requirements.txt` every time you add a new dependency! It's a good idea to run this each time you pull from git.
 
 Installing Web Client dependencies
 
@@ -28,6 +28,8 @@ Installing Web Client dependencies
 cd client
 yarn install
 ```
+
+> The above step should be ran each time you pull from git (during active development), because of possible dependency changes in `package.json`.
 
 ### Running locally
 
@@ -37,7 +39,7 @@ API Server is based on Python [`flask-socketio`](https://flask-socketio.readthed
 
 ```sh
 cd server
-python3 -u app.py
+python3 app.py
 ```
 
 The API server starts at http://localhost:5000.
