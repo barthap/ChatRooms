@@ -10,7 +10,6 @@ import {
   VideoCallButton,
   InfoButton,
   ExpansionPanel,
-  TypingIndicator,
   MessageSeparator,
 } from '@chatscope/chat-ui-kit-react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
@@ -22,10 +21,10 @@ import { useAuth } from '../common/auth';
 import { groupAvatarUrl2 } from '../common/avatars';
 import { IMessage } from '../common/message';
 import { ChatSocketManager } from '../common/socket';
-import ApiComponent from '../components/ApiComponent';
 import ConversationSidebar from '../components/ConversationSidebar';
 import CookieInfo from '../components/CookieInfo';
 import { renderMessages } from '../components/Messages';
+import ApiComponent from '../components/ServerStatus';
 
 export default function ChatPage() {
   const [sid, setSid] = useState<string | null>(null);
@@ -81,7 +80,7 @@ export default function ChatPage() {
   return (
     <div
       style={{
-        height: '600px',
+        height: '100%',
         position: 'relative',
       }}>
       <MainContainer responsive>
@@ -89,15 +88,15 @@ export default function ChatPage() {
         <ChatContainer>
           <ConversationHeader>
             <ConversationHeader.Back />
-            <Avatar src={groupAvatarUrl2('Default Room')} name="Zoe" />
-            <ConversationHeader.Content userName="Default Room" info="Active 0 mins ago" />
+            <Avatar src={groupAvatarUrl2('Default Room')} name="Default Room" />
+            <ConversationHeader.Content userName="Default Room" info="You join here by default" />
             <ConversationHeader.Actions>
               <VoiceCallButton />
               <VideoCallButton />
               <InfoButton />
             </ConversationHeader.Actions>
           </ConversationHeader>
-          <MessageList typingIndicator={<TypingIndicator content="Nobody is typing" />}>
+          <MessageList>
             <MessageSeparator content="Your conversation starts here." />
 
             {renderMessages(messages, auth?.user)}
@@ -110,6 +109,9 @@ export default function ChatPage() {
             <p>
               You are logged in as <b>{auth?.user?.name}</b>
             </p>
+            <button className="btn btn-sm btn-primary mb-3" onClick={() => auth?.signOut()}>
+              Logout
+            </button>
             <CookieInfo />
           </ExpansionPanel>
           <ExpansionPanel open title="DEBUG INFO">
@@ -123,9 +125,6 @@ export default function ChatPage() {
             <p>Lorem ipsum</p>
             <p>Lorem ipsum</p>
             <p>Lorem ipsum</p>
-            <button className="btn btn-primary" onClick={() => auth?.signOut()}>
-              Logout
-            </button>
           </ExpansionPanel>
         </Sidebar>
       </MainContainer>

@@ -6,6 +6,7 @@ import {
   Avatar,
 } from '@chatscope/chat-ui-kit-react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
@@ -15,11 +16,24 @@ import { groupAvatarUrl2 } from '../common/avatars';
 export default function ConversationSidebar() {
   return (
     <Sidebar position="left" scrollable={false}>
-      <Button border icon={<FontAwesomeIcon icon={faPlus} />}>
+      <Button border icon={<FontAwesomeIcon icon={faPlus} />} className="mt-3 mb-3">
         Create new room
       </Button>
       <ConversationList>
-        <Conversation name="Lilly" lastSenderName="Lilly" info="Yes i can do it for you">
+        <Conversation name="Default Room" info="You join here when you log in" active>
+          <Avatar src={groupAvatarUrl2('Default Room')} name="Default Room" status="available" />
+        </Conversation>
+        <Conversation name="Dummy Room 1" info="Just a dummy, you cannot join here yet">
+          <Avatar src={groupAvatarUrl2('Dummy 1')} status="dnd" />
+        </Conversation>
+      </ConversationList>
+    </Sidebar>
+  );
+}
+
+/* A few examples
+ 
+       <Conversation name="Lilly" lastSenderName="Lilly" info="Yes i can do it for you">
           <Avatar src={groupAvatarUrl2('Lilly')} name="Lilly" status="available" />
         </Conversation>
 
@@ -54,7 +68,5 @@ export default function ConversationSidebar() {
         <Conversation name="Patrik" lastSenderName="Patrik" info="Yes i can do it for you">
           <Avatar src={groupAvatarUrl2('Patrik')} name="Patrik" status="invisible" />
         </Conversation>
-      </ConversationList>
-    </Sidebar>
-  );
-}
+
+*/

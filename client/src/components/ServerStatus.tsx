@@ -5,14 +5,15 @@ import { API_URL } from '../common/constants';
 async function fetchServer() {
   try {
     const result = await fetch(API_URL + '/health');
-    return result.text();
+    const text = await result.text();
+    return text === 'OK' ? 'Up ✅' : text;
   } catch (e) {
     console.error(e);
-    return 'Down :(';
+    return '❌ Down :(';
   }
 }
 
-export default function ApiComponent() {
+export default function ServerStatus() {
   const [status, setStatus] = useState('loading...');
 
   useEffect(() => {

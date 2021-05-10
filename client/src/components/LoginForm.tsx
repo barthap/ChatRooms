@@ -26,6 +26,7 @@ export default function LoginForm({ onSubmit, errorMessage }: Props = {}) {
         <div className="col-sm-9">
           <input
             type="text"
+            minLength={3}
             className="form-control"
             placeholder="Enter your nickname"
             id="nickname"

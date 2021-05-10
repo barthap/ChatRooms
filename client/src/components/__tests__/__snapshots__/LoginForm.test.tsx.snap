@@ -24,6 +24,7 @@ Object {
             <input
               class="form-control"
               id="nickname"
+              minlength="3"
               name="nickname"
               placeholder="Enter your nickname"
               type="text"
@@ -67,6 +68,7 @@ Object {
           <input
             class="form-control"
             id="nickname"
+            minlength="3"
             name="nickname"
             placeholder="Enter your nickname"
             type="text"
