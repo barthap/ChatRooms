@@ -6,6 +6,7 @@ from datetime import datetime
 from errors.room import RoomNotFoundError
 
 from logger import logger as log
+from rooms import room
 from rooms.manager import room_manager
 from users.manager import user_manager
 from errors.auth import InvalidUserIdError
@@ -51,13 +52,28 @@ class ChatNamespace(Namespace):
         super().__init__(*args, **kwargs)
         self.sessions: Dict[str, User] = {}
 
+    def _set_socketio(self, socketio):
+        super()._set_socketio(socketio)
+        user_manager.register_socket(self.socketio)
+        room_manager.register_socket(self.socketio)
+
+    def _remove_room_if_empty(self, room_id: str, also_if_one_user=False):
+      """
+      param also_if_one_user: remove if one user, not empty
+      """
+      lst = user_manager.find_users_in_room(room_id)
+      target_len = 1 if also_if_one_user else 0
+      if len(lst) <= target_len:
+        log.debug(f'Cleaning up empty room id={room_id} unless permament')
+        room_manager.delete_room(room_id, skip_permament=True)
+
     def on_connect(self):
         user_id = request.headers['X-USER-ID'] if 'X-USER-ID' in request.headers else None
         if not user_id in user_manager.users:
           raise InvalidUserIdError()
 
         user = user_manager.users[user_id]
-        if user.current_room == None:
+        if user.current_room == None or user.current_room.id not in room_manager.rooms:
           user.current_room = room_manager.default_room
 
         sid = request.sid
@@ -75,7 +91,9 @@ class ChatNamespace(Namespace):
         user = self.sessions[sid]
         user.session_id = None
         user.meta['disconnected_at'] = now()
-        broadcast_room_left(user, user.current_room.id)
+        user_room_id = user.current_room.id
+        broadcast_room_left(user, user_room_id)
+        self._remove_room_if_empty(user_room_id, also_if_one_user=True)
 
         del self.sessions[sid]
         log.info(f'{user} disconnected from chat (sid={sid})')
@@ -89,10 +107,12 @@ class ChatNamespace(Namespace):
         raise RoomNotFoundError({'room_id': room_id})
 
       requester = self.sessions[request.sid]
-      leave_room(requester.current_room.id)
-      broadcast_room_left(requester, requester.current_room.id)
-
+      prev_room_id = requester.current_room.id
+      leave_room(prev_room_id)
+      broadcast_room_left(requester, prev_room_id)
+      
       requester.current_room = room
+      self._remove_room_if_empty(prev_room_id)
       broadcast_room_joined(requester, room.id)
       join_room(room.id)
       emit('room_changed', room.to_dict())

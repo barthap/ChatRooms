@@ -18,6 +18,7 @@ socketio = SocketIO(app, cors_allowed_origins='*', logger=True)
 
 @app.route('/')
 def hello_world():
+    socketio.emit('room_list_changed', 'hi', namespace='/chat')
     return 'Hello, Chat!'
 
 @app.route('/health')
