@@ -7,8 +7,6 @@ import { useAuth } from '../common/auth';
 import CookieInfo from './CookieInfo';
 import ServerStatus from './ServerStatus';
 
-type ReturnType<F> = F extends (...args: unknown[]) => infer T ? T : never;
-
 export default function RightSidebar({
   auth,
   sid,

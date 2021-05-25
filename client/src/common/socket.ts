@@ -19,7 +19,8 @@ export class ChatSocketManager {
   readonly onDisconnectHandlers = new EventHandler();
   readonly onChatMessageHandlers = new EventHandler<[msg: IMessage]>();
   readonly onConnectionErrorHandlers = new EventHandler<[err: Error]>();
-  readonly onRoomChangedHandlers = new EventHandler<[room: IRoom]>();
+  readonly onCurrentRoomChangedHandlers = new EventHandler<[room: IRoom]>();
+  readonly onRoomListChangedHandlers = new EventHandler<[rooms: IRoom[]]>();
 
   constructor({ authUser, namespace = '/chat' }: ConstructorOptions = {}) {
     const socket = io(`${WEBSOCKET_URL}${namespace}`, {
@@ -53,7 +54,11 @@ export class ChatSocketManager {
     });
 
     socket.on('room_changed', (room: IRoom) => {
-      this.onRoomChangedHandlers.notify(room);
+      this.onCurrentRoomChangedHandlers.notify(room);
+    });
+
+    socket.on('room_list_changed', rooms => {
+      this.onRoomListChangedHandlers.notify(rooms);
     });
 
     this.socket = socket;
@@ -101,6 +106,7 @@ export class ChatSocketManager {
     this.onConnectHandlers.removeAllListeners();
     this.onConnectionErrorHandlers.removeAllListeners();
     this.onDisconnectHandlers.removeAllListeners();
-    this.onRoomChangedHandlers.removeAllListeners();
+    this.onCurrentRoomChangedHandlers.removeAllListeners();
+    this.onRoomListChangedHandlers.removeAllListeners();
   }
 }

@@ -1,33 +1,19 @@
-import {
-  MainContainer,
-  ChatContainer,
-  MessageList,
-  MessageInput,
-  Avatar,
-  ConversationHeader,
-  VoiceCallButton,
-  VideoCallButton,
-  InfoButton,
-  MessageSeparator,
-} from '@chatscope/chat-ui-kit-react';
+import { MainContainer } from '@chatscope/chat-ui-kit-react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import { useAuth } from '../common/auth';
-import { groupAvatarUrl2 } from '../common/avatars';
-import { IMessage } from '../common/message';
 import { IRoom } from '../common/room';
 import { ChatSocketManager } from '../common/socket';
+import ConversationContainer from '../components/ConversationContainer';
 import ConversationSidebar from '../components/ConversationSidebar';
-import { renderMessages } from '../components/Messages';
 import RightSidebar from '../components/RightSidebar';
 
 export default function ChatPage() {
   const [sid, setSid] = useState<string | null>(null);
   const [socket, setSocket] = useState<ChatSocketManager | undefined>();
-  const [messages, setMessages] = useState<IMessage[]>([]);
   const [room, setRoom] = useState<IRoom>({ id: '_none', name: 'Loading...', description: '' });
 
   console.count('Render');
@@ -55,13 +41,10 @@ export default function ChatPage() {
       }
     });
     // a new message has arrived
-    manager.onChatMessageHandlers.addListener(msg => {
-      setMessages(oldMsgs => [...oldMsgs, msg]);
-    });
+    manager.onChatMessageHandlers.addListener(msg => {});
     // server has assigned the user to a room
-    manager.onRoomChangedHandlers.addListener(room => {
+    manager.onCurrentRoomChangedHandlers.addListener(room => {
       setRoom(room);
-      setMessages([]);
     });
 
     manager.connect();
@@ -75,11 +58,6 @@ export default function ChatPage() {
     };
   }, []);
 
-  //
-  const sendMessage = (text: string) => {
-    socket?.sendMessage({ content: text });
-  };
-
   // user has clicked a room on left sidebar
   const requestRoomChange = (newRoom: IRoom) => {
     if (room.id === newRoom.id) {
@@ -88,19 +66,6 @@ export default function ChatPage() {
     socket?.switchRoom(newRoom.id);
   };
 
-  const RenderHeader = ({ room: { name, description }, as: _as }: { room: IRoom; as: any }) => (
-    <ConversationHeader>
-      <ConversationHeader.Back />
-      <Avatar src={groupAvatarUrl2(name)} name={name} />
-      <ConversationHeader.Content userName={name} info={description} />
-      <ConversationHeader.Actions>
-        <VoiceCallButton disabled />
-        <VideoCallButton disabled />
-        <InfoButton />
-      </ConversationHeader.Actions>
-    </ConversationHeader>
-  );
-
   return (
     <div
       style={{
@@ -108,15 +73,12 @@ export default function ChatPage() {
         position: 'relative',
       }}>
       <MainContainer responsive>
-        <ConversationSidebar activeRoomChanged={requestRoomChange} activeRoomId={room.id} />
-        <ChatContainer>
-          <RenderHeader room={room} as={ConversationHeader} />
-          <MessageList>
-            <MessageSeparator content="Your conversation starts here." />
-            {renderMessages(messages, auth?.user)}
-          </MessageList>
-          <MessageInput placeholder="Type message here" onSend={sendMessage} />
-        </ChatContainer>
+        <ConversationSidebar
+          activeRoomChanged={requestRoomChange}
+          activeRoomId={room.id}
+          socket={socket}
+        />
+        <ConversationContainer auth={auth} socket={socket} room={room} />
         <RightSidebar auth={auth} sid={sid ?? undefined} />
       </MainContainer>
     </div>

@@ -9,11 +9,12 @@ import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { groupAvatarUrl2 } from '../common/avatars';
 import { API_URL } from '../common/constants';
 import { IRoom } from '../common/room';
+import { ChatSocketManager } from '../common/socket';
 import { useAsync } from '../common/utils';
 
 async function loadRooms(): Promise<IRoom[]> {
@@ -30,6 +31,7 @@ interface ItemProps {
   room: IRoom;
   isActive: boolean;
   onClick?: (room: IRoom) => void;
+  as?: unknown;
 }
 
 const RoomListItem = ({ room, isActive, onClick }: ItemProps) => (
@@ -45,25 +47,35 @@ const RoomListItem = ({ room, isActive, onClick }: ItemProps) => (
 export default function ConversationSidebar({
   activeRoomId,
   activeRoomChanged,
+  socket,
 }: {
   activeRoomId: string;
   activeRoomChanged?: (room: IRoom) => void;
+  socket?: ChatSocketManager;
 }) {
   const [rooms, setRooms] = useState<IRoom[]>([]);
-  //const [activeRoomId, setActiveRoomId] = useState('_default');
 
   const changeActiveRoom = (room: IRoom) => {
-    //setActiveRoomId(room.id);
     activeRoomChanged?.(room);
   };
 
-  console.count('Sidebar Render');
+  // listen for room list change from server
+  useEffect(() => {
+    const listener = socket?.onRoomListChangedHandlers.addListener(roomList => {
+      console.log('Romms changed, cnt=', roomList.length);
+      setRooms(roomList);
+    });
+    return () => {
+      listener && socket?.onRoomListChangedHandlers.removeListener(listener);
+    };
+  });
+
+  // initial load room list using HTTP /rooms API
   useAsync(loadRooms, rooms => {
     setRooms(rooms);
-
-    //const defaultRoom = rooms.find(room => room.id === activeRoomId);
-    //defaultRoom && activeRoomChanged?.(defaultRoom);
   });
+
+  console.count('Sidebar Render');
 
   return (
     <Sidebar position="left" scrollable={false}>
@@ -74,6 +86,7 @@ export default function ConversationSidebar({
       <ConversationList loading={rooms.length === 0}>
         {rooms.map(room => (
           <RoomListItem
+            as={Conversation}
             key={room.id}
             room={room}
             isActive={room.id === activeRoomId}
