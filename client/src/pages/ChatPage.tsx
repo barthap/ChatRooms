@@ -3,13 +3,11 @@ import {
   ChatContainer,
   MessageList,
   MessageInput,
-  Sidebar,
   Avatar,
   ConversationHeader,
   VoiceCallButton,
   VideoCallButton,
   InfoButton,
-  ExpansionPanel,
   MessageSeparator,
 } from '@chatscope/chat-ui-kit-react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
@@ -20,18 +18,17 @@ import { useHistory } from 'react-router-dom';
 import { useAuth } from '../common/auth';
 import { groupAvatarUrl2 } from '../common/avatars';
 import { IMessage } from '../common/message';
+import { IRoom } from '../common/room';
 import { ChatSocketManager } from '../common/socket';
 import ConversationSidebar from '../components/ConversationSidebar';
-import CookieInfo from '../components/CookieInfo';
 import { renderMessages } from '../components/Messages';
-import ApiComponent from '../components/ServerStatus';
+import RightSidebar from '../components/RightSidebar';
 
 export default function ChatPage() {
   const [sid, setSid] = useState<string | null>(null);
-
   const [socket, setSocket] = useState<ChatSocketManager | undefined>();
-
   const [messages, setMessages] = useState<IMessage[]>([]);
+  const [room, setRoom] = useState<IRoom>({ id: '_none', name: 'Loading...', description: '' });
 
   console.count('Render');
 
@@ -57,8 +54,14 @@ export default function ChatPage() {
         console.warn(err);
       }
     });
+    // a new message has arrived
     manager.onChatMessageHandlers.addListener(msg => {
       setMessages(oldMsgs => [...oldMsgs, msg]);
+    });
+    // server has assigned the user to a room
+    manager.onRoomChangedHandlers.addListener(room => {
+      setRoom(room);
+      setMessages([]);
     });
 
     manager.connect();
@@ -67,15 +70,36 @@ export default function ChatPage() {
     return () => {
       manager.disconnect();
       manager.clearAllEventHandlers();
-      setSid(null);
       setSocket(undefined);
       console.log('Removed manager instance');
     };
   }, []);
 
+  //
   const sendMessage = (text: string) => {
     socket?.sendMessage({ content: text });
   };
+
+  // user has clicked a room on left sidebar
+  const requestRoomChange = (newRoom: IRoom) => {
+    if (room.id === newRoom.id) {
+      return;
+    }
+    socket?.switchRoom(newRoom.id);
+  };
+
+  const RenderHeader = ({ room: { name, description }, as: _as }: { room: IRoom; as: any }) => (
+    <ConversationHeader>
+      <ConversationHeader.Back />
+      <Avatar src={groupAvatarUrl2(name)} name={name} />
+      <ConversationHeader.Content userName={name} info={description} />
+      <ConversationHeader.Actions>
+        <VoiceCallButton disabled />
+        <VideoCallButton disabled />
+        <InfoButton />
+      </ConversationHeader.Actions>
+    </ConversationHeader>
+  );
 
   return (
     <div
@@ -84,49 +108,16 @@ export default function ChatPage() {
         position: 'relative',
       }}>
       <MainContainer responsive>
-        <ConversationSidebar />
+        <ConversationSidebar activeRoomChanged={requestRoomChange} activeRoomId={room.id} />
         <ChatContainer>
-          <ConversationHeader>
-            <ConversationHeader.Back />
-            <Avatar src={groupAvatarUrl2('Default Room')} name="Default Room" />
-            <ConversationHeader.Content userName="Default Room" info="You join here by default" />
-            <ConversationHeader.Actions>
-              <VoiceCallButton />
-              <VideoCallButton />
-              <InfoButton />
-            </ConversationHeader.Actions>
-          </ConversationHeader>
+          <RenderHeader room={room} as={ConversationHeader} />
           <MessageList>
             <MessageSeparator content="Your conversation starts here." />
-
             {renderMessages(messages, auth?.user)}
           </MessageList>
           <MessageInput placeholder="Type message here" onSend={sendMessage} />
         </ChatContainer>
-
-        <Sidebar position="right">
-          <ExpansionPanel open title="INFO">
-            <p>
-              You are logged in as <b>{auth?.user?.name}</b>
-            </p>
-            <button className="btn btn-sm btn-primary mb-3" onClick={() => auth?.signOut()}>
-              Logout
-            </button>
-            <CookieInfo />
-          </ExpansionPanel>
-          <ExpansionPanel open title="DEBUG INFO">
-            <ApiComponent />
-            <p>Your SID: {sid}</p>
-            <p>Your username: {auth?.user?.name}</p>
-            <p>Your user ID: {auth?.user?.id}</p>
-          </ExpansionPanel>
-          <ExpansionPanel title="OPTIONS">
-            <p>Lorem ipsum</p>
-            <p>Lorem ipsum</p>
-            <p>Lorem ipsum</p>
-            <p>Lorem ipsum</p>
-          </ExpansionPanel>
-        </Sidebar>
+        <RightSidebar auth={auth} sid={sid ?? undefined} />
       </MainContainer>
     </div>
   );

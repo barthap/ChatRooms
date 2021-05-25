@@ -2,7 +2,8 @@ import { io, Socket } from 'socket.io-client';
 
 import { WEBSOCKET_URL } from './constants';
 import { EventHandler } from './eventListener';
-import { IMessage } from './message';
+import { IMessage, ITextMessage } from './message';
+import { IRoom } from './room';
 import { IUser } from './user';
 
 interface ConstructorOptions {
@@ -18,6 +19,7 @@ export class ChatSocketManager {
   readonly onDisconnectHandlers = new EventHandler();
   readonly onChatMessageHandlers = new EventHandler<[msg: IMessage]>();
   readonly onConnectionErrorHandlers = new EventHandler<[err: Error]>();
+  readonly onRoomChangedHandlers = new EventHandler<[room: IRoom]>();
 
   constructor({ authUser, namespace = '/chat' }: ConstructorOptions = {}) {
     const socket = io(`${WEBSOCKET_URL}${namespace}`, {
@@ -50,6 +52,10 @@ export class ChatSocketManager {
       this.onChatMessageHandlers.notify(msg);
     });
 
+    socket.on('room_changed', (room: IRoom) => {
+      this.onRoomChangedHandlers.notify(room);
+    });
+
     this.socket = socket;
   }
 
@@ -63,8 +69,21 @@ export class ChatSocketManager {
     this.socket.disconnect();
   }
 
-  sendMessage(msg: Omit<IMessage, 'sender' | 'id'>) {
+  /**
+   * Sends a text message to the chat in the current room
+   * @param msg IMessage object with `content` field
+   */
+  sendMessage(msg: Pick<ITextMessage, 'content'>) {
     this.socket.emit('send_message', msg);
+  }
+
+  /**
+   * Request server to switch rooms for the current user
+   * @param newRoomId ID of the room to join
+   */
+  switchRoom(newRoomId: IRoom['id']) {
+    console.log('Switching room to', newRoomId);
+    this.socket.emit('switch_room', { room_id: newRoomId });
   }
 
   get socketIo(): Socket {
@@ -74,10 +93,14 @@ export class ChatSocketManager {
     return this._sid;
   }
 
+  /**
+   * Removes all listeners for all socket events
+   */
   clearAllEventHandlers() {
     this.onChatMessageHandlers.removeAllListeners();
     this.onConnectHandlers.removeAllListeners();
     this.onConnectionErrorHandlers.removeAllListeners();
     this.onDisconnectHandlers.removeAllListeners();
+    this.onRoomChangedHandlers.removeAllListeners();
   }
 }
