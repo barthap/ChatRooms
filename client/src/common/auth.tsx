@@ -59,7 +59,7 @@ function useProvideAuth(): IAuth {
   const [cookies, setCookie, removeCookie] = useCookies(['user']);
   const user: IUser | null = cookies.user ?? null;
 
-  console.log('hook', user);
+  console.log('useProvideAuth', user);
 
   const signIn = async (username: string) => {
     const user = await createUser(username);

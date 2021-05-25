@@ -9,23 +9,77 @@ import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { groupAvatarUrl2 } from '../common/avatars';
+import { API_URL } from '../common/constants';
+import { IRoom } from '../common/room';
+import { useAsync } from '../common/utils';
 
-export default function ConversationSidebar() {
+async function loadRooms(): Promise<IRoom[]> {
+  try {
+    const result = await fetch(API_URL + '/rooms/');
+    return await result.json();
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}
+
+interface ItemProps {
+  room: IRoom;
+  isActive: boolean;
+  onClick?: (room: IRoom) => void;
+}
+
+const RoomListItem = ({ room, isActive, onClick }: ItemProps) => (
+  <Conversation
+    name={room.name}
+    info={room.description}
+    active={isActive}
+    onClick={() => onClick?.(room)}>
+    <Avatar src={groupAvatarUrl2(room.name)} name={room.name} status="available" />
+  </Conversation>
+);
+
+export default function ConversationSidebar({
+  activeRoomId,
+  activeRoomChanged,
+}: {
+  activeRoomId: string;
+  activeRoomChanged?: (room: IRoom) => void;
+}) {
+  const [rooms, setRooms] = useState<IRoom[]>([]);
+  //const [activeRoomId, setActiveRoomId] = useState('_default');
+
+  const changeActiveRoom = (room: IRoom) => {
+    //setActiveRoomId(room.id);
+    activeRoomChanged?.(room);
+  };
+
+  console.count('Sidebar Render');
+  useAsync(loadRooms, rooms => {
+    setRooms(rooms);
+
+    //const defaultRoom = rooms.find(room => room.id === activeRoomId);
+    //defaultRoom && activeRoomChanged?.(defaultRoom);
+  });
+
   return (
     <Sidebar position="left" scrollable={false}>
       <Button border icon={<FontAwesomeIcon icon={faPlus} />} className="mt-3 mb-3">
         Create new room
       </Button>
-      <ConversationList>
-        <Conversation name="Default Room" info="You join here when you log in" active>
-          <Avatar src={groupAvatarUrl2('Default Room')} name="Default Room" status="available" />
-        </Conversation>
-        <Conversation name="Dummy Room 1" info="Just a dummy, you cannot join here yet">
-          <Avatar src={groupAvatarUrl2('Dummy 1')} status="dnd" />
-        </Conversation>
+
+      <ConversationList loading={rooms.length === 0}>
+        {rooms.map(room => (
+          <RoomListItem
+            key={room.id}
+            room={room}
+            isActive={room.id === activeRoomId}
+            onClick={changeActiveRoom}
+          />
+        ))}
       </ConversationList>
     </Sidebar>
   );
