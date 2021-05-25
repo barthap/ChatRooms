@@ -53,7 +53,7 @@ export default function ConversationContainer({
     return () => {
       listener && socket?.onChatMessageHandlers.removeListener(listener);
     };
-  });
+  }, [socket]);
 
   // clear messages when room changed
   useEffect(() => setMessages([]), [room]);

@@ -1,19 +1,34 @@
 import { Sidebar, ExpansionPanel } from '@chatscope/chat-ui-kit-react';
-import React from 'react';
+import React, { useState } from 'react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { useAuth } from '../common/auth';
+import { ChatSocketManager } from '../common/socket';
+import { IUser } from '../common/user';
 import CookieInfo from './CookieInfo';
 import ServerStatus from './ServerStatus';
 
 export default function RightSidebar({
   auth,
-  sid,
+  socket,
 }: {
-  sid?: string;
   auth?: ReturnType<typeof useAuth>;
+  socket?: ChatSocketManager;
 }) {
+  const [users, setUsers] = useState<IUser[]>([]);
+  const [sid, setSid] = useState<string | null>(null);
+
+  React.useEffect(() => {
+    const usersListener = socket?.onUserListChangedHandlers.addListener(setUsers);
+    const connListener = socket?.onConnectHandlers.addListener(setSid);
+
+    return () => {
+      usersListener && socket?.onUserListChangedHandlers.removeListener(usersListener);
+      connListener && socket?.onConnectHandlers.removeListener(connListener);
+    };
+  }, [socket]);
+
   return (
     <Sidebar position="right">
       <ExpansionPanel open title="INFO">
@@ -25,7 +40,14 @@ export default function RightSidebar({
         </button>
         <CookieInfo />
       </ExpansionPanel>
-      <ExpansionPanel open title="DEBUG INFO">
+      <ExpansionPanel open title="Users">
+        <ul>
+          {users.map(u => (
+            <li key={u.id}>{u.name}</li>
+          ))}
+        </ul>
+      </ExpansionPanel>
+      <ExpansionPanel title="DEBUG INFO">
         <ServerStatus />
         <p>Your SID: {sid}</p>
         <p>Your username: {auth?.user?.name}</p>

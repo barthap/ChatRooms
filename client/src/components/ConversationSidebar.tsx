@@ -61,14 +61,11 @@ export default function ConversationSidebar({
 
   // listen for room list change from server
   useEffect(() => {
-    const listener = socket?.onRoomListChangedHandlers.addListener(roomList => {
-      console.log('Romms changed, cnt=', roomList.length);
-      setRooms(roomList);
-    });
+    const listener = socket?.onRoomListChangedHandlers.addListener(setRooms);
     return () => {
       listener && socket?.onRoomListChangedHandlers.removeListener(listener);
     };
-  });
+  }, [socket]);
 
   // initial load room list using HTTP /rooms API
   useAsync(loadRooms, rooms => {

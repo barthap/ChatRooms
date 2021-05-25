@@ -12,7 +12,6 @@ import ConversationSidebar from '../components/ConversationSidebar';
 import RightSidebar from '../components/RightSidebar';
 
 export default function ChatPage() {
-  const [sid, setSid] = useState<string | null>(null);
   const [socket, setSocket] = useState<ChatSocketManager | undefined>();
   const [room, setRoom] = useState<IRoom>({ id: '_none', name: 'Loading...', description: '' });
 
@@ -28,9 +27,6 @@ export default function ChatPage() {
       authUser: auth?.user,
     });
 
-    manager.onConnectHandlers.addListener(sid => {
-      setSid(sid);
-    });
     manager.onConnectionErrorHandlers.addListener(err => {
       if (err.message === 'invalid_user_id') {
         console.warn('User ID is invalid, redirecting to login');
@@ -79,7 +75,7 @@ export default function ChatPage() {
           socket={socket}
         />
         <ConversationContainer auth={auth} socket={socket} room={room} />
-        <RightSidebar auth={auth} sid={sid ?? undefined} />
+        <RightSidebar auth={auth} socket={socket} />
       </MainContainer>
     </div>
   );
