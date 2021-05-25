@@ -9,6 +9,7 @@ export enum MessageType {
 interface IMessageBase {
   id: string;
   type: MessageType;
+  timestamp: number;
 }
 
 export interface ITextMessage extends IMessageBase {

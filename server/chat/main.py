@@ -17,6 +17,9 @@ MSG_TYPE_USER_JOINED = 1
 MSG_TYPE_USER_LEFT = 2
 
 
+now = lambda: int(datetime.now().timestamp())
+
+
 def broadcast_room_joined(user: User, room: str):
   """
   Broadcasts to room that user has joined 
@@ -24,7 +27,8 @@ def broadcast_room_joined(user: User, room: str):
   msg = {
     'id': shortuuid.random(length=10),
     'type': MSG_TYPE_USER_JOINED,
-    'user': user.to_dict()
+    'user': user.to_dict(),
+    'timestamp': now()
   }
   emit('chat_message', msg, to=room)
 
@@ -36,7 +40,8 @@ def broadcast_room_left(user: User, room: str):
   msg = {
     'id': shortuuid.random(length=10),
     'type': MSG_TYPE_USER_LEFT,
-    'user': user.to_dict()
+    'user': user.to_dict(),
+    'timestamp': now()
   }
   emit('chat_message', msg, to=room)
 
@@ -69,7 +74,7 @@ class ChatNamespace(Namespace):
       if sid in self.sessions:
         user = self.sessions[sid]
         user.session_id = None
-        user.meta['disconnected_at'] = int(datetime.now().timestamp())
+        user.meta['disconnected_at'] = now()
         broadcast_room_left(user, user.current_room.id)
 
         del self.sessions[sid]
@@ -104,6 +109,7 @@ class ChatNamespace(Namespace):
         data['id'] = shortuuid.random(length=10)
         data['sender'] = sender.to_dict()
         data['type'] = MSG_TYPE_DEFAULT
+        data['timestamp'] = now()
 
         log.debug(f'[{sender} -> {sender.current_room}]: {content}')
 

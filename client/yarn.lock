@@ -1166,10 +1166,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@chatscope/chat-ui-kit-react@^1.6.1":
-  version "1.6.1"
-  resolved "https://registry.yarnpkg.com/@chatscope/chat-ui-kit-react/-/chat-ui-kit-react-1.6.1.tgz#55a8d32d699e7485cd62b8feb0d547112478df88"
-  integrity sha512-Q+4Vm7iymO/tYlBIOdECG0SrLG9zKJTOx5A1NoXpl1UoQ0Sadv99VwaEqC+YjwSRhR4ceGGhPxYWaeKaz1gUfQ==
+"@chatscope/chat-ui-kit-react@^1.7.2":
+  version "1.7.2"
+  resolved "https://registry.yarnpkg.com/@chatscope/chat-ui-kit-react/-/chat-ui-kit-react-1.7.2.tgz#cbc8b8a13d597f925c5f6ccd84dc557fa1e95176"
+  integrity sha512-9UXNUUGb0CnOC/e6NdIePzpzCZ8BSOfYWZZQeAa2usPlC3UfGo0L/kJrCNVBfaZVzXqgowQRubx1cMnBk/WyKw==
   dependencies:
     "@chatscope/chat-ui-kit-styles" "^1.2.0"
     "@fortawesome/fontawesome-free" "^5.12.1"

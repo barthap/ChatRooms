@@ -24,7 +24,7 @@ class User(object):
     return self.to_dict()
 
   def __repr__(self):
-    return f'User[id={self.id}, name={self.name}]'
+    return f'User[{self.id}, name={self.name}]'
 
   def __str__(self):
-    return f'User[id={self.id}, name={self.name}]'
+    return f'User[{self.id}, name={self.name}]'

@@ -15,3 +15,11 @@ export function useAsync<TResultType>(
     };
   }, [asyncFn]);
 }
+
+/**
+ * Unix timestamp to locale hour (HH:mm:ss in Europe)
+ */
+export function timestampToLocaleTime(timestamp: number) {
+  const date = new Date(timestamp * 1000);
+  return date.toLocaleTimeString();
+}

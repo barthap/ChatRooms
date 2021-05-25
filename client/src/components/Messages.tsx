@@ -4,6 +4,7 @@ import * as React from 'react';
 import { userAvatarUrl } from '../common/avatars';
 import { IMessage, isTextMessage, ITextMessage, MessageType } from '../common/message';
 import { IUser } from '../common/user';
+import { timestampToLocaleTime } from '../common/utils';
 
 export function renderMessages(messages: IMessage[], sender?: IUser | null) {
   const count = messages.length;
@@ -15,10 +16,12 @@ export function renderMessages(messages: IMessage[], sender?: IUser | null) {
     const next = isLast ? undefined : arr[idx + 1];
 
     if (!isTextMessage(msg)) {
+      const { user, timestamp } = msg;
+      const time = timestampToLocaleTime(timestamp);
       if (msg.type === MessageType.USER_JOINED) {
-        return <MessageSeparator content={`${msg.user.name} has joined the room.`} />;
+        return <MessageSeparator content={`${user.name} has joined the room at ${time}`} />;
       } else if (msg.type === MessageType.USER_LEFT) {
-        return <MessageSeparator content={`${msg.user.name} has left the room.`} />;
+        return <MessageSeparator content={`${user.name} has left the room at ${time}`} />;
       } else throw new Error('this should never happen');
     }
 
@@ -39,6 +42,7 @@ function renderMessage(
 ) {
   const shouldRenderAvatar = !isSelf && isUserFirst;
   const avatarUrl = userAvatarUrl(msg.sender.id);
+  const sentTime = timestampToLocaleTime(msg.timestamp);
 
   const position =
     isUserFirst && isUserLast ? 'single' : isUserFirst ? 'first' : isUserLast ? 'last' : 'normal';
@@ -48,14 +52,23 @@ function renderMessage(
       key={msg.id}
       model={{
         message: msg.content,
-        sentTime: '15 mins ago',
+        sentTime,
         sender: msg.sender.id,
         direction: isSelf ? 'outgoing' : 'incoming',
         position,
       }}
       avatarSpacer={!isUserFirst && !isSelf}>
-      {isUserFirst && <Message.Header sender={msg.sender.name} />}
+      <Message.Header sender={msg.sender.name} />
+      {isUserLast && messageFooter(sentTime)}
       {shouldRenderAvatar && <Avatar src={avatarUrl} name="Zoe" />}
     </Message>
   );
 }
+
+const messageFooter = (sentTime: string) => (
+  <Message.Footer>
+    <div className="cs-message__sent-time" style={{ display: 'block' }}>
+      {sentTime}
+    </div>
+  </Message.Footer>
+);
