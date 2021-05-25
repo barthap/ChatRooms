@@ -1,12 +1,12 @@
-import logging
 from flask import Flask, request
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit, send
+from flask_socketio import SocketIO
 import os
 from logger import logger as log
 
 from chat.main import ChatNamespace
 from users.router import users_router
+from rooms.router import rooms_router
 from errors.auth import InvalidUserIdError
 
 app = Flask(__name__)                           # Create Flask instance
@@ -29,6 +29,7 @@ def health():
     return 'OK'
 
 app.register_blueprint(users_router, url_prefix='/users')
+app.register_blueprint(rooms_router, url_prefix='/rooms')
 
 
 ################################################

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 import { API_URL } from '../common/constants';
+import { useAsync } from '../common/utils';
 
 async function fetchServer() {
   try {
@@ -16,9 +17,7 @@ async function fetchServer() {
 export default function ServerStatus() {
   const [status, setStatus] = useState('loading...');
 
-  useEffect(() => {
-    fetchServer().then(body => setStatus(body));
-  }, []);
+  useAsync(fetchServer, setStatus);
 
   return (
     <p>
