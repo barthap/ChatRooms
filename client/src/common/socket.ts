@@ -53,7 +53,7 @@ export class ChatSocketManager {
       this.onChatMessageHandlers.notify(msg);
     });
 
-    socket.on('room_changed', (room: IRoom) => {
+    socket.on('current_room_changed', (room: IRoom) => {
       this.onCurrentRoomChangedHandlers.notify(room);
     });
 

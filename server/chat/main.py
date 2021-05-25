@@ -82,7 +82,7 @@ class ChatNamespace(Namespace):
 
         broadcast_room_joined(user, user.current_room.id)
         join_room(user.current_room.id)
-        emit('room_changed', user.current_room.to_dict())
+        emit('current_room_changed', user.current_room.to_dict())
         log.info(f'{user} connected to chat (sid={sid})')
 
     def on_disconnect(self):
@@ -115,7 +115,7 @@ class ChatNamespace(Namespace):
       self._remove_room_if_empty(prev_room_id)
       broadcast_room_joined(requester, room.id)
       join_room(room.id)
-      emit('room_changed', room.to_dict())
+      emit('current_room_changed', room.to_dict())
 
       log.info(f'{requester} has joined {room}')
 
