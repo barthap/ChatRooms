@@ -3,3 +3,5 @@ export interface IRoom {
   name: string;
   description: string;
 }
+
+export type NewRoom = Pick<IRoom, 'name' | 'description'>;

@@ -1,14 +1,6 @@
-import {
-  Sidebar,
-  Button,
-  ConversationList,
-  Conversation,
-  Avatar,
-} from '@chatscope/chat-ui-kit-react';
+import { Sidebar, ConversationList, Conversation, Avatar } from '@chatscope/chat-ui-kit-react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState, useEffect } from 'react';
 
 import { groupAvatarUrl2 } from '../common/avatars';
@@ -16,6 +8,7 @@ import { API_URL } from '../common/constants';
 import { IRoom } from '../common/room';
 import { ChatSocketManager } from '../common/socket';
 import { useAsync } from '../common/utils';
+import AddRoomModal from './AddRoomModal';
 
 async function loadRooms(): Promise<IRoom[]> {
   try {
@@ -76,9 +69,7 @@ export default function ConversationSidebar({
 
   return (
     <Sidebar position="left" scrollable={false}>
-      <Button border icon={<FontAwesomeIcon icon={faPlus} />} className="mt-3 mb-3">
-        Create new room
-      </Button>
+      <AddRoomModal />
 
       <ConversationList loading={rooms.length === 0}>
         {rooms.map(room => (
