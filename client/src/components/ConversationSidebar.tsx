@@ -29,11 +29,12 @@ interface ItemProps {
 
 const RoomListItem = ({ room, isActive, onClick }: ItemProps) => (
   <Conversation
+    key={room.id}
     name={room.name}
     info={room.description}
     active={isActive}
     onClick={() => onClick?.(room)}>
-    <Avatar src={groupAvatarUrl2(room.name)} name={room.name} status="available" />
+    <Avatar src={groupAvatarUrl2(room.name)} name={room.name} />
   </Conversation>
 );
 

@@ -8,6 +8,7 @@ import { ChatSocketManager } from '../common/socket';
 import { IUser } from '../common/user';
 import CookieInfo from './CookieInfo';
 import ServerStatus from './ServerStatus';
+import UserList from './UserList';
 
 export default function RightSidebar({
   auth,
@@ -29,6 +30,10 @@ export default function RightSidebar({
     };
   }, [socket]);
 
+  // we need to find current user in `users` list since `auth`
+  // doesn't contain room (and other) information
+  const currentUser = users.find(u => u.id === auth?.user?.id);
+
   return (
     <Sidebar position="right">
       <ExpansionPanel open title="INFO">
@@ -40,12 +45,8 @@ export default function RightSidebar({
         </button>
         <CookieInfo />
       </ExpansionPanel>
-      <ExpansionPanel open title="Users">
-        <ul>
-          {users.map(u => (
-            <li key={u.id}>{u.name}</li>
-          ))}
-        </ul>
+      <ExpansionPanel open title="ACTIVE USERS">
+        <UserList users={users} currentUser={currentUser} />
       </ExpansionPanel>
       <ExpansionPanel title="DEBUG INFO">
         <ServerStatus />
