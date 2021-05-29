@@ -19,6 +19,7 @@ import { IMessage } from '../common/message';
 import { IRoom } from '../common/room';
 import { ChatSocketManager } from '../common/socket';
 import { renderMessages } from '../components/Messages';
+import MessageInputEx, { OnSendRequest } from './MessageInputEx';
 
 const ContainerHeader = ({ room: { name, description }, as: _as }: { room: IRoom; as: any }) => (
   <ConversationHeader>
@@ -58,8 +59,8 @@ export default function ConversationContainer({
   // clear messages when room changed
   useEffect(() => setMessages([]), [room]);
 
-  const sendMessage = (text: string) => {
-    socket?.sendMessage({ content: text });
+  const sendMessage: OnSendRequest = message => {
+    socket?.sendMessage(message);
   };
 
   return (
@@ -69,7 +70,7 @@ export default function ConversationContainer({
         <MessageSeparator content="Your conversation starts here." />
         {renderMessages(messages, auth?.user)}
       </MessageList>
-      <MessageInput placeholder="Type message here" onSend={sendMessage} />
+      <MessageInputEx as={MessageInput} onSend={sendMessage} />
     </ChatContainer>
   );
 }

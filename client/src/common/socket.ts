@@ -2,7 +2,7 @@ import { io, Socket } from 'socket.io-client';
 
 import { WEBSOCKET_URL } from './constants';
 import { EventHandler } from './eventListener';
-import { IMessage, ITextMessage } from './message';
+import { IFileMessage, IMessage, ITextMessage } from './message';
 import { IRoom } from './room';
 import { IUser } from './user';
 
@@ -83,7 +83,7 @@ export class ChatSocketManager {
    * Sends a text message to the chat in the current room
    * @param msg IMessage object with `content` field
    */
-  sendMessage(msg: Pick<ITextMessage, 'content'>) {
+  sendMessage(msg: Pick<ITextMessage, 'content'> | Pick<IFileMessage, 'url'>) {
     this.socket.emit('send_message', msg);
   }
 

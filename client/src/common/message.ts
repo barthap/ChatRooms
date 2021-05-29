@@ -12,10 +12,16 @@ interface IMessageBase {
   timestamp: number;
 }
 
-export interface ITextMessage extends IMessageBase {
+interface MessageWithContent extends IMessageBase {
   type: typeof MessageType.MESSAGE;
-  content: string;
   sender: IUser;
+}
+
+export interface IFileMessage extends MessageWithContent {
+  url: string;
+}
+export interface ITextMessage extends MessageWithContent {
+  content: string;
 }
 
 interface IUserJoinedMessage extends IMessageBase {
@@ -29,7 +35,11 @@ interface IUserLeftMessage extends IMessageBase {
 }
 
 export function isTextMessage(msg?: IMessage): msg is ITextMessage {
-  return msg?.type === MessageType.MESSAGE;
+  return msg?.type === MessageType.MESSAGE && (msg as any).content;
 }
 
-export type IMessage = ITextMessage | IUserJoinedMessage | IUserLeftMessage;
+export function isFileMessage(msg?: IMessage): msg is IFileMessage {
+  return msg?.type === MessageType.MESSAGE && (msg as any).url;
+}
+
+export type IMessage = ITextMessage | IFileMessage | IUserJoinedMessage | IUserLeftMessage;
