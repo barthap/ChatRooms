@@ -34,16 +34,16 @@ export class ChatSocketManager {
       console.log('Connected to /chat with sid', socket.id);
       this._sid = socket.id;
 
-      this.onConnectHandlers.notify(socket.id);
+      this.onConnectHandlers.notifyAllListeners(socket.id);
     });
     socket.on('disconnect', () => {
       this._sid = null;
       console.log('Disconnected');
-      this.onDisconnectHandlers.notify();
+      this.onDisconnectHandlers.notifyAllListeners();
     });
     socket.on('connect_error', err => {
       if (err instanceof Error) {
-        this.onConnectionErrorHandlers.notify(err);
+        this.onConnectionErrorHandlers.notifyAllListeners(err);
       } else {
         console.error(err);
       }
@@ -51,19 +51,19 @@ export class ChatSocketManager {
 
     socket.on('chat_message', (msg: IMessage) => {
       console.log('Received message:', msg);
-      this.onChatMessageHandlers.notify(msg);
+      this.onChatMessageHandlers.notifyAllListeners(msg);
     });
 
     socket.on('current_room_changed', (room: IRoom) => {
-      this.onCurrentRoomChangedHandlers.notify(room);
+      this.onCurrentRoomChangedHandlers.notifyAllListeners(room);
     });
 
     socket.on('room_list_changed', rooms => {
-      this.onRoomListChangedHandlers.notify(rooms);
+      this.onRoomListChangedHandlers.notifyAllListeners(rooms);
     });
 
     socket.on('user_list_changed', users => {
-      this.onUserListChangedHandlers.notify(users);
+      this.onUserListChangedHandlers.notifyAllListeners(users);
     });
 
     this.socket = socket;

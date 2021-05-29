@@ -14,9 +14,9 @@ export class EventHandler<TEventArgs extends unknown[] = []> {
     this.listeners.delete(id);
   }
 
-  notify(...args: TEventArgs) {
-    for (const l of this.listeners.values()) {
-      l(...args);
+  notifyAllListeners(...args: TEventArgs) {
+    for (const handler of this.listeners.values()) {
+      handler(...args);
     }
   }
 

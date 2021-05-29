@@ -1,48 +1,64 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<LoginForm /> renders form snapshot without error message 1`] = `
+exports[`<NewRoomForm /> renders form snapshot without error message 1`] = `
 Object {
   "asFragment": [Function],
   "baseElement": <body>
     <div>
       <form>
         <h3>
-          Welcome to Chat Rooms
+          Add New Room
         </h3>
         <div
-          class="form-group row mb-3"
+          class="mb-3"
         >
           <label
-            class="col-sm-3 col-form-label"
-            for="nickname"
+            class="form-label"
+            for="name"
           >
-            Nickname:
+            Name:
           </label>
-          <div
-            class="col-sm-9"
-          >
-            <input
-              class="form-control"
-              id="nickname"
-              minlength="3"
-              name="nickname"
-              placeholder="Enter your nickname"
-              type="text"
-              value=""
-            />
-          </div>
+          <input
+            class="form-control"
+            id="name"
+            minlength="2"
+            name="name"
+            placeholder="Enter room name"
+            type="text"
+            value=""
+          />
         </div>
         <div
-          class="d-flex justify-content-between"
+          class="mb-3"
         >
-          <p
-            class="text-danger"
+          <label
+            class="col-form-label"
+            for="description"
+          >
+            Description:
+          </label>
+          <input
+            class="form-control"
+            id="description"
+            name="description"
+            placeholder="Enter room description"
+            type="text"
+            value=""
           />
+        </div>
+        <div
+          class="d-flex justify-content-end"
+        >
+          <button
+            class="btn btn-secondary me-3"
+          >
+            Cancel
+          </button>
           <button
             class="btn btn-primary"
             type="submit"
           >
-            Enter chat
+            Create Room
           </button>
         </div>
       </form>
@@ -51,42 +67,58 @@ Object {
   "container": <div>
     <form>
       <h3>
-        Welcome to Chat Rooms
+        Add New Room
       </h3>
       <div
-        class="form-group row mb-3"
+        class="mb-3"
       >
         <label
-          class="col-sm-3 col-form-label"
-          for="nickname"
+          class="form-label"
+          for="name"
         >
-          Nickname:
+          Name:
         </label>
-        <div
-          class="col-sm-9"
-        >
-          <input
-            class="form-control"
-            id="nickname"
-            minlength="3"
-            name="nickname"
-            placeholder="Enter your nickname"
-            type="text"
-            value=""
-          />
-        </div>
+        <input
+          class="form-control"
+          id="name"
+          minlength="2"
+          name="name"
+          placeholder="Enter room name"
+          type="text"
+          value=""
+        />
       </div>
       <div
-        class="d-flex justify-content-between"
+        class="mb-3"
       >
-        <p
-          class="text-danger"
+        <label
+          class="col-form-label"
+          for="description"
+        >
+          Description:
+        </label>
+        <input
+          class="form-control"
+          id="description"
+          name="description"
+          placeholder="Enter room description"
+          type="text"
+          value=""
         />
+      </div>
+      <div
+        class="d-flex justify-content-end"
+      >
+        <button
+          class="btn btn-secondary me-3"
+        >
+          Cancel
+        </button>
         <button
           class="btn btn-primary"
           type="submit"
         >
-          Enter chat
+          Create Room
         </button>
       </div>
     </form>
