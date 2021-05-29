@@ -5,10 +5,10 @@ import React, { useState, useEffect } from 'react';
 
 import { groupAvatarUrl2 } from '../common/avatars';
 import { API_URL } from '../common/constants';
-import { IRoom } from '../common/room';
+import { createRoom, IRoom } from '../common/room';
 import { ChatSocketManager } from '../common/socket';
 import { useAsync } from '../common/utils';
-import AddRoomModal from './AddRoomModal';
+import AddRoomModal, { AddRoomCallback } from './AddRoomModal';
 
 async function loadRooms(): Promise<IRoom[]> {
   try {
@@ -52,6 +52,21 @@ export default function ConversationSidebar({
     activeRoomChanged?.(room);
   };
 
+  const addRoom: AddRoomCallback = async (roomData, setError, closeModal) => {
+    try {
+      const room = await createRoom(roomData);
+      closeModal();
+      changeActiveRoom(room);
+    } catch (e: unknown) {
+      console.error(e);
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError('Unknown error, please see console');
+      }
+    }
+  };
+
   // listen for room list change from server
   useEffect(() => {
     const listener = socket?.onRoomListChangedHandlers.addListener(setRooms);
@@ -69,7 +84,7 @@ export default function ConversationSidebar({
 
   return (
     <Sidebar position="left" scrollable={false}>
-      <AddRoomModal />
+      <AddRoomModal onAddRoom={addRoom} />
 
       <ConversationList loading={rooms.length === 0}>
         {rooms.map(room => (

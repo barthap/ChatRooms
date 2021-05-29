@@ -13,14 +13,23 @@ import NewRoomForm from './NewRoomForm';
 Modal.setAppElement('#root');
 
 interface Props {
-  onAddRoom?: (newRoom: NewRoom) => void;
+  onAddRoom?: AddRoomCallback;
+}
+
+export interface AddRoomCallback {
+  (newRoom: NewRoom, setError: (error: string) => void, closeModal: () => void): void;
 }
 
 export default function AddRoomModal({ onAddRoom }: Props) {
   const [modalIsOpen, setIsOpen] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
+
+  const onSubmit = (room: NewRoom) => {
+    onAddRoom?.(room, setErrorMessage, closeModal);
+  };
 
   return (
     <>
@@ -36,7 +45,7 @@ export default function AddRoomModal({ onAddRoom }: Props) {
         onRequestClose={closeModal}
         style={customStyles}
         contentLabel="Add New Room">
-        <NewRoomForm onSubmit={closeModal} onCancel={closeModal} />
+        <NewRoomForm onSubmit={onSubmit} onCancel={closeModal} errorMessage={errorMessage} />
       </Modal>
     </>
   );

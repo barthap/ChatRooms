@@ -28,7 +28,7 @@ export default function NewRoomForm({ onSubmit, onCancel, errorMessage }: Props 
         </label>
         <input
           type="text"
-          minLength={3}
+          minLength={2}
           className="form-control"
           placeholder="Enter room name"
           id="name"
@@ -43,7 +43,6 @@ export default function NewRoomForm({ onSubmit, onCancel, errorMessage }: Props 
         </label>
         <input
           type="text"
-          minLength={3}
           className="form-control"
           placeholder="Enter room description"
           id="description"
@@ -62,7 +61,7 @@ export default function NewRoomForm({ onSubmit, onCancel, errorMessage }: Props 
           Cancel
         </button>
         <button type="submit" className="btn btn-primary">
-          Add Room
+          Create Room
         </button>
       </div>
     </form>
