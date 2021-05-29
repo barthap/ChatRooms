@@ -63,11 +63,13 @@ yarn start
 
 Now you can run app at http://localhost:3000. It requires the API server to be running.
 
+> In order to be able to send attachments, you need to rename `.env.development.local.example` to `.env.development.local` and paste your imgBB API key there.
+
 ## Deploying production build to local docker
 
 There is possibility to deploy the app into local docker environment.
 
-1. Rename file `.env.production.local.example` to `.env.production.local`.
+1. Go into `client` directory and rename file `.env.production.local.example` to `.env.production.local` and paste your imgBB API key there.
 2. Start compose project
 
 ```sh
