@@ -17,7 +17,7 @@ export default function LoginForm({ onSubmit, errorMessage }: Props = {}) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <h3>Sign In</h3>
+      <h3>Welcome to Chat Rooms</h3>
 
       <div className="form-group row mb-3">
         <label htmlFor="nickname" className="col-sm-3 col-form-label">

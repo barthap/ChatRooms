@@ -132,7 +132,6 @@ class ChatNamespace(Namespace):
         data['timestamp'] = now()
 
         log.debug(f'[{sender} -> {sender.current_room}]: {content}')
-
         emit('chat_message', data, to=sender.current_room.id)
 
     def _join_room(self, requester: User, room: Room):
@@ -141,5 +140,8 @@ class ChatNamespace(Namespace):
       emit('current_room_changed', room.to_dict())
 
     def _update_user_list(self):
+      """
+      Broadcasts an updated user list to all clients
+      """
       users = list(map(lambda u: u.to_dict(), user_manager.users.values()));
-      emit('user_list_changed', users);
+      emit('user_list_changed', users, broadcast=True)
