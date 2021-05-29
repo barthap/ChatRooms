@@ -1,6 +1,10 @@
 const IMGBB_API_ENDPOINT_URL = 'https://api.imgbb.com/1/upload';
 const IMGBB_API_KEY = process.env.REACT_APP_IMGBB_KEY;
 
+const DEFAULT_EXPIRATION_TIME = 60 * 60 * 24; // 24 hours
+const IMAGE_EXPIRATION_TIME =
+  process.env.REACT_APP_IMAGE_EXPIRE_TIME || DEFAULT_EXPIRATION_TIME.toString();
+
 export interface PhotoUploadResponse {
   data: {
     id: string;
@@ -39,6 +43,7 @@ export async function uploadImage(image: File): Promise<PhotoUploadResponse> {
   const formData = new FormData();
   formData.append('image', image);
   formData.append('key', IMGBB_API_KEY);
+  formData.append('expiration', IMAGE_EXPIRATION_TIME);
 
   try {
     const response = await fetch(IMGBB_API_ENDPOINT_URL, {
