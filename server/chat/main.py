@@ -123,7 +123,9 @@ class ChatNamespace(Namespace):
     def on_send_message(self, data):
         sid = request.sid
         sender = self.sessions[sid]
-        content = data['content']
+
+        content = data['content'] if 'content' in data else None
+        url = data['url'] if 'url' in data else None
 
         # decorate message content with metadata
         data['id'] = shortuuid.random(length=10)
@@ -131,7 +133,8 @@ class ChatNamespace(Namespace):
         data['type'] = MSG_TYPE_DEFAULT
         data['timestamp'] = now()
 
-        log.debug(f'[{sender} -> {sender.current_room}]: {content}')
+        msg_value = content if content else 'url: ' + url
+        log.debug(f'[{sender} -> {sender.current_room}]: {msg_value}')
         emit('chat_message', data, to=sender.current_room.id)
 
     def _join_room(self, requester: User, room: Room):

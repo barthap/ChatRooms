@@ -64,6 +64,7 @@ jobs:
           SERVER_URL=https://${{ secrets.APP_DOMAIN }}
           echo "REACT_APP_API_URL=$SERVER_URL/api" > .env.production
           echo "REACT_APP_WS_URL=$SERVER_URL" >> .env.production
+          echo "REACT_APP_IMGBB_KEY=${{ secrets.IMGBB_KEY }}" >> .env.production
       - name: Login to personal Container Registry
         uses: docker/login-action@v1
         with:

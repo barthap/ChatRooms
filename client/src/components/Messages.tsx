@@ -2,7 +2,14 @@ import { Message, Avatar, MessageSeparator } from '@chatscope/chat-ui-kit-react'
 import * as React from 'react';
 
 import { userAvatarUrl } from '../common/avatars';
-import { IMessage, isTextMessage, ITextMessage, MessageType } from '../common/message';
+import {
+  IFileMessage,
+  IMessage,
+  isFileMessage,
+  isTextMessage,
+  ITextMessage,
+  MessageType,
+} from '../common/message';
 import { IUser } from '../common/user';
 import { timestampToLocaleTime } from '../common/utils';
 
@@ -15,7 +22,7 @@ export function renderMessages(messages: IMessage[], sender?: IUser | null) {
     const prev = isFirst ? undefined : arr[idx - 1];
     const next = isLast ? undefined : arr[idx + 1];
 
-    if (!isTextMessage(msg)) {
+    if (!isTextMessage(msg) && !isFileMessage(msg)) {
       const { user, timestamp } = msg;
       const time = timestampToLocaleTime(timestamp);
       if (msg.type === MessageType.USER_JOINED) {
@@ -35,7 +42,7 @@ export function renderMessages(messages: IMessage[], sender?: IUser | null) {
 }
 
 function renderMessage(
-  msg: ITextMessage,
+  msg: ITextMessage | IFileMessage,
   isSelf: boolean,
   isUserFirst: boolean,
   isUserLast: boolean
@@ -51,7 +58,7 @@ function renderMessage(
     <Message
       key={msg.id}
       model={{
-        message: msg.content,
+        message: isTextMessage(msg) ? msg.content : undefined,
         sentTime,
         sender: msg.sender.id,
         direction: isSelf ? 'outgoing' : 'incoming',
@@ -61,6 +68,13 @@ function renderMessage(
       <Message.Header sender={msg.sender.name} />
       {isUserLast && messageFooter(sentTime)}
       {shouldRenderAvatar && <Avatar src={avatarUrl} name="Zoe" />}
+      {isFileMessage(msg) && (
+        <Message.CustomContent>
+          <a href={msg.url} target="_blank" rel="noreferrer">
+            <img src={msg.url} alt="attachment" style={{ maxWidth: '300px', maxHeight: '300px' }} />
+          </a>
+        </Message.CustomContent>
+      )}
     </Message>
   );
 }
