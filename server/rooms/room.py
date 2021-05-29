@@ -2,10 +2,11 @@ import shortuuid
 from datetime import datetime
 
 class Room(object):
-  def __init__(self, name: str, description: str = ''):
+  def __init__(self, name: str, description: str = '', is_permament=False):
     self.id = shortuuid.random(length=8)
     self.name = name
     self.description = description
+    self.is_permament=is_permament
     self.meta = {
       'created_at': int(datetime.now().timestamp())
     }

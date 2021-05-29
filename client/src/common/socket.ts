@@ -19,7 +19,9 @@ export class ChatSocketManager {
   readonly onDisconnectHandlers = new EventHandler();
   readonly onChatMessageHandlers = new EventHandler<[msg: IMessage]>();
   readonly onConnectionErrorHandlers = new EventHandler<[err: Error]>();
-  readonly onRoomChangedHandlers = new EventHandler<[room: IRoom]>();
+  readonly onCurrentRoomChangedHandlers = new EventHandler<[room: IRoom]>();
+  readonly onRoomListChangedHandlers = new EventHandler<[rooms: IRoom[]]>();
+  readonly onUserListChangedHandlers = new EventHandler<[users: IUser[]]>();
 
   constructor({ authUser, namespace = '/chat' }: ConstructorOptions = {}) {
     const socket = io(`${WEBSOCKET_URL}${namespace}`, {
@@ -32,16 +34,16 @@ export class ChatSocketManager {
       console.log('Connected to /chat with sid', socket.id);
       this._sid = socket.id;
 
-      this.onConnectHandlers.notify(socket.id);
+      this.onConnectHandlers.notifyAllListeners(socket.id);
     });
     socket.on('disconnect', () => {
       this._sid = null;
       console.log('Disconnected');
-      this.onDisconnectHandlers.notify();
+      this.onDisconnectHandlers.notifyAllListeners();
     });
     socket.on('connect_error', err => {
       if (err instanceof Error) {
-        this.onConnectionErrorHandlers.notify(err);
+        this.onConnectionErrorHandlers.notifyAllListeners(err);
       } else {
         console.error(err);
       }
@@ -49,11 +51,19 @@ export class ChatSocketManager {
 
     socket.on('chat_message', (msg: IMessage) => {
       console.log('Received message:', msg);
-      this.onChatMessageHandlers.notify(msg);
+      this.onChatMessageHandlers.notifyAllListeners(msg);
     });
 
-    socket.on('room_changed', (room: IRoom) => {
-      this.onRoomChangedHandlers.notify(room);
+    socket.on('current_room_changed', (room: IRoom) => {
+      this.onCurrentRoomChangedHandlers.notifyAllListeners(room);
+    });
+
+    socket.on('room_list_changed', rooms => {
+      this.onRoomListChangedHandlers.notifyAllListeners(rooms);
+    });
+
+    socket.on('user_list_changed', users => {
+      this.onUserListChangedHandlers.notifyAllListeners(users);
     });
 
     this.socket = socket;
@@ -101,6 +111,8 @@ export class ChatSocketManager {
     this.onConnectHandlers.removeAllListeners();
     this.onConnectionErrorHandlers.removeAllListeners();
     this.onDisconnectHandlers.removeAllListeners();
-    this.onRoomChangedHandlers.removeAllListeners();
+    this.onCurrentRoomChangedHandlers.removeAllListeners();
+    this.onRoomListChangedHandlers.removeAllListeners();
+    this.onUserListChangedHandlers.removeAllListeners();
   }
 }

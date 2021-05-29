@@ -17,7 +17,10 @@ class User(object):
     return {
       'name': self.name,
       'id': self.id,
-      'session_id': self.session_id
+      'session_id': self.session_id,
+      'current_room': self.current_room.to_dict() if self.current_room is not None else None,
+      'disconnected_at': self.meta.get('disconnected_at', None),
+      'created_at': self.meta['created_at']
     }
 
   def serialize(self):

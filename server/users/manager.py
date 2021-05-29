@@ -1,4 +1,5 @@
-from typing import Dict, Union
+from typing import Dict, List, Union
+from flask_socketio import SocketIO
 from datetime import datetime
 
 from users.user import User
@@ -10,7 +11,11 @@ EXPIRE_TIME = 60 # 60 seconds
 
 class UserManager:
   def __init__(self):
-    self.users: Dict[User] = dict()
+    self.users: Dict[str, User] = dict()
+    self.socketio: SocketIO = None
+
+  def register_socket(self, socketio: SocketIO):
+    self.socketio = socketio
 
   def name_exists(self, name: str) -> bool:
     return any(map(lambda u: u.name == name, self.users.values()))
@@ -51,6 +56,9 @@ class UserManager:
       del self.users[user_id]
     else:
       raise UserNotFoundError(f"Cannot delete user with id {user_id} because it doesnt exist already")
+
+  def find_users_in_room(self, room_id: str) -> List[User]:
+    return list(filter(lambda u: u.current_room != None and u.current_room.id == room_id, self.users.values()))
 
 
 user_manager = UserManager()

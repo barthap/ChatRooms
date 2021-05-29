@@ -1,20 +1,14 @@
-import {
-  Sidebar,
-  Button,
-  ConversationList,
-  Conversation,
-  Avatar,
-} from '@chatscope/chat-ui-kit-react';
+import { Sidebar, ConversationList, Conversation, Avatar } from '@chatscope/chat-ui-kit-react';
 import '@chatscope/chat-ui-kit-styles/dist/default/styles.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { faPlus } from '@fortawesome/free-solid-svg-icons/faPlus';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { groupAvatarUrl2 } from '../common/avatars';
 import { API_URL } from '../common/constants';
-import { IRoom } from '../common/room';
+import { createRoom, IRoom } from '../common/room';
+import { ChatSocketManager } from '../common/socket';
 import { useAsync } from '../common/utils';
+import AddRoomModal, { AddRoomCallback } from './AddRoomModal';
 
 async function loadRooms(): Promise<IRoom[]> {
   try {
@@ -30,50 +24,73 @@ interface ItemProps {
   room: IRoom;
   isActive: boolean;
   onClick?: (room: IRoom) => void;
+  as?: unknown;
 }
 
 const RoomListItem = ({ room, isActive, onClick }: ItemProps) => (
   <Conversation
+    key={room.id}
     name={room.name}
     info={room.description}
     active={isActive}
     onClick={() => onClick?.(room)}>
-    <Avatar src={groupAvatarUrl2(room.name)} name={room.name} status="available" />
+    <Avatar src={groupAvatarUrl2(room.name)} name={room.name} />
   </Conversation>
 );
 
 export default function ConversationSidebar({
   activeRoomId,
   activeRoomChanged,
+  socket,
 }: {
   activeRoomId: string;
   activeRoomChanged?: (room: IRoom) => void;
+  socket?: ChatSocketManager;
 }) {
   const [rooms, setRooms] = useState<IRoom[]>([]);
-  //const [activeRoomId, setActiveRoomId] = useState('_default');
 
   const changeActiveRoom = (room: IRoom) => {
-    //setActiveRoomId(room.id);
     activeRoomChanged?.(room);
   };
 
-  console.count('Sidebar Render');
+  const addRoom: AddRoomCallback = async (roomData, setError, closeModal) => {
+    try {
+      const room = await createRoom(roomData);
+      closeModal();
+      changeActiveRoom(room);
+    } catch (e: unknown) {
+      console.error(e);
+      if (e instanceof Error) {
+        setError(e.message);
+      } else {
+        setError('Unknown error, please see console');
+      }
+    }
+  };
+
+  // listen for room list change from server
+  useEffect(() => {
+    const listener = socket?.onRoomListChangedHandlers.addListener(setRooms);
+    return () => {
+      listener && socket?.onRoomListChangedHandlers.removeListener(listener);
+    };
+  }, [socket]);
+
+  // initial load room list using HTTP /rooms API
   useAsync(loadRooms, rooms => {
     setRooms(rooms);
-
-    //const defaultRoom = rooms.find(room => room.id === activeRoomId);
-    //defaultRoom && activeRoomChanged?.(defaultRoom);
   });
+
+  console.count('Sidebar Render');
 
   return (
     <Sidebar position="left" scrollable={false}>
-      <Button border icon={<FontAwesomeIcon icon={faPlus} />} className="mt-3 mb-3">
-        Create new room
-      </Button>
+      <AddRoomModal onAddRoom={addRoom} />
 
       <ConversationList loading={rooms.length === 0}>
         {rooms.map(room => (
           <RoomListItem
+            as={Conversation}
             key={room.id}
             room={room}
             isActive={room.id === activeRoomId}
