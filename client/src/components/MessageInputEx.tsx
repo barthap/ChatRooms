@@ -18,7 +18,7 @@ type InputEvent = (
 ) => void;
 
 export interface OnSendRequest {
-  (msg: { content: string } | { url: string }): void;
+  (msg: { content: string } | { url: string; alt?: string; thumbnailUrl?: string }): void;
 }
 
 const toHtmlImg = (src: string) => `<img src="${src}" style="height: 80px;"/>`;
@@ -78,8 +78,12 @@ export default function MessageInputEx({ onSend }: { onSend?: OnSendRequest; as?
 
     try {
       setIsUploading(true);
-      const result = await uploadImage(attachmentFile);
-      onSend?.({ url: result.data.image?.url ?? result.data.url });
+      const { data } = await uploadImage(attachmentFile);
+      onSend?.({
+        url: data.image?.url ?? data.url,
+        alt: data.title,
+        thumbnailUrl: data.thumb?.url,
+      });
       setAttachmentFile(null);
       setRawValue('');
       setMode(Mode.TEXT);

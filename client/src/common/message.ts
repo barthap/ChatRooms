@@ -19,6 +19,8 @@ interface MessageWithContent extends IMessageBase {
 
 export interface IFileMessage extends MessageWithContent {
   url: string;
+  thumbnailUrl?: string;
+  alt?: string;
 }
 export interface ITextMessage extends MessageWithContent {
   content: string;

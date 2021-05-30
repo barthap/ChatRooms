@@ -71,7 +71,11 @@ function renderMessage(
       {isFileMessage(msg) && (
         <Message.CustomContent>
           <a href={msg.url} target="_blank" rel="noreferrer">
-            <img src={msg.url} alt="attachment" style={{ maxWidth: '300px', maxHeight: '300px' }} />
+            <img
+              src={msg.thumbnailUrl ?? msg.url}
+              alt={msg.alt ?? 'attachment thumbnail'}
+              style={{ maxWidth: '300px', maxHeight: '300px' }}
+            />
           </a>
         </Message.CustomContent>
       )}

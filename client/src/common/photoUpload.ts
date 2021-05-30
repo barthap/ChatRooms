@@ -1,7 +1,7 @@
 const IMGBB_API_ENDPOINT_URL = 'https://api.imgbb.com/1/upload';
 const IMGBB_API_KEY = process.env.REACT_APP_IMGBB_KEY;
 
-const DEFAULT_EXPIRATION_TIME = 60 * 60 * 24; // 24 hours
+const DEFAULT_EXPIRATION_TIME = 60 * 60 * 12; // 12 hours
 const IMAGE_EXPIRATION_TIME =
   process.env.REACT_APP_IMAGE_EXPIRE_TIME || DEFAULT_EXPIRATION_TIME.toString();
 
