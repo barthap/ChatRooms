@@ -21,7 +21,7 @@ import { ChatSocketManager } from '../common/socket';
 import { renderMessages } from '../components/Messages';
 import MessageInputEx, { OnSendRequest } from './MessageInputEx';
 
-const ContainerHeader = ({ room: { name, description }, as: _as }: { room: IRoom; as: any }) => (
+const ContainerHeader = ({ room: { name, description } }: { room: IRoom; as?: unknown }) => (
   <ConversationHeader>
     <ConversationHeader.Back />
     <Avatar src={groupAvatarUrl2(name)} name={name} />

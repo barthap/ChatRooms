@@ -26,10 +26,39 @@ const toHtmlImg = (src: string) => `<img src="${src}" style="height: 80px;"/>`;
 export default function MessageInputEx({ onSend }: { onSend?: OnSendRequest; as?: unknown }) {
   const [rawValue, setRawValue] = React.useState('');
   const [mode, setMode] = React.useState(Mode.TEXT);
-  const attachmentInputRef = React.useRef<HTMLInputElement>(null);
-
-  const [attachmentFile, setAttachmentFile] = React.useState<File | null>(null);
   const [isUploading, setIsUploading] = React.useState(false);
+
+  // reference to virtal file selection input
+  const attachmentInputRef = React.useRef<HTMLInputElement>(null);
+  // store actual selected file
+  const attachmentFile = React.useRef<File | null>();
+  // store URL to local file blob - used only for preview image
+  const attachmentLocalUrl = React.useRef<string>();
+
+  const setAttachment = (file: File) => {
+    attachmentFile.current = file;
+    // clear previous blob URL
+    if (attachmentLocalUrl.current) {
+      URL.revokeObjectURL(attachmentLocalUrl.current);
+    }
+    const newUrl = URL.createObjectURL(file);
+    attachmentLocalUrl.current = newUrl;
+
+    setRawValue(toHtmlImg(newUrl));
+    setMode(Mode.IMAGE);
+  };
+
+  // remove attachment info and come back to text mode
+  const clearAttachment = () => {
+    attachmentFile.current = null;
+    setRawValue('');
+    setMode(Mode.TEXT);
+
+    if (attachmentLocalUrl.current) {
+      URL.revokeObjectURL(attachmentLocalUrl.current);
+      attachmentLocalUrl.current = undefined;
+    }
+  };
 
   // when attachment button clicked
   const onAttachClick = () => {
@@ -43,50 +72,39 @@ export default function MessageInputEx({ onSend }: { onSend?: OnSendRequest; as?
     event.preventDefault();
     const file = event.target.files?.[0];
 
-    if (!file) {
-      setMode(Mode.TEXT);
-      setRawValue('');
-      return;
+    if (file) {
+      setAttachment(file);
+    } else {
+      clearAttachment();
     }
-
-    console.log(file);
-    setAttachmentFile(file);
-    const reader = new FileReader();
-    reader.onload = ev => {
-      if (!ev.target?.result) return;
-      setMode(Mode.IMAGE);
-      setRawValue(toHtmlImg(ev.target?.result?.toString()));
-    };
-    reader.readAsDataURL(file);
   };
 
   // when enter is pressed or send button clicked
-  const onSendInner: InputEvent = async (raw, ..._args) => {
-    // console.log('onSend', raw, _args);
+  const onSendInner: InputEvent = async raw => {
     if (mode === Mode.TEXT) {
       onSend?.({ content: raw });
       setRawValue('');
       return;
     }
 
-    if (!attachmentFile) {
+    // this should never happen
+    if (!attachmentFile.current) {
       console.warn('Invalid state, no file in image mode');
-      setMode(Mode.TEXT);
-      setRawValue('');
+      clearAttachment();
       return;
     }
 
     try {
       setIsUploading(true);
-      const { data } = await uploadImage(attachmentFile);
+
+      const { data } = await uploadImage(attachmentFile.current);
       onSend?.({
         url: data.image?.url ?? data.url,
         alt: data.title,
         thumbnailUrl: data.thumb?.url,
       });
-      setAttachmentFile(null);
-      setRawValue('');
-      setMode(Mode.TEXT);
+      // clear atttachment after upload
+      clearAttachment();
     } catch (e) {
       console.error(e);
       setRawValue(val => `${val} Error: try again`);
@@ -95,25 +113,17 @@ export default function MessageInputEx({ onSend }: { onSend?: OnSendRequest; as?
     }
   };
 
-  // debug only
-  // React.useEffect(() => console.log('mode', mode), [mode]);
-  // React.useEffect(() => console.log('raw', rawValue), [rawValue]);
-
   // Called when input field changes
-  const onChange: InputEvent = (raw, _1, _2, _nodes) => {
-    // console.log('onChange', raw, _1, _2, _nodes);
-
+  const onChange: InputEvent = raw => {
     if (mode === Mode.TEXT) {
       setRawValue(raw);
-      return;
     }
-
     // user deleted an image (backspace)
     // go back to text mode
-    if (raw === '') {
-      setRawValue(raw);
-      setMode(Mode.TEXT);
+    else if (raw === '') {
+      clearAttachment();
     }
+    // don't change value otherwise in image mode
   };
 
   return (
