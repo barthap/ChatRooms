@@ -1,6 +1,28 @@
 # ChatRooms
 
-A distributed system example - chat rooms project using Socket.io
+A distributed system example - chat rooms project using Socket.io. Written as an experiment to try out Flask and Socket.io.
+
+> The app is not production ready, it has some design flaws and bad practices. However, it may serve as an example. Please contact me if you have any questions.
+
+#### Features
+
+- Simple chat application, with the following rules:
+  - Type in a nickname and enter chat
+  - Join any chat room by selecting it from the list on the left
+  - Users cannot see messages from before they joined
+  - When switching rooms, previous chat history is no longer visible to users after rejoining
+  - When last user leaves a room, it is automatically deleted (except persistent rooms like the default one)
+- Possibility to send image attachments
+- Displays list of active users
+- Automatically generated avatars for users and rooms
+- Technical stack:
+  - React/Typescript frontend + chat-ui-kit-react lib
+  - Python/Flask backend
+  - Socket.IO for websocket communication, using Flask-SocketIO library
+  - Node.js/Express server acting as API Gateway/Proxy for Python server. Also used for hosting React client static files.
+  - Docker-compose based architecture
+  - Github Actions CI pipeline with deploy to VPS Docker with nginx-proxy
+  - Attachment Image hosting at imgbb.com
 
 ## Local development
 
