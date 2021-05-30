@@ -5,8 +5,8 @@ set -euo pipefail
 # set up env
 echo "Setting up environment..."
 
-echo "VIRTUAL_HOST=$APP_DOMAIN" > client.env
-echo "LETSENCRYPT_HOST=$APP_DOMAIN" >> client.env
+echo "VIRTUAL_HOST=$APP_DOMAIN" > gateway.env
+echo "LETSENCRYPT_HOST=$APP_DOMAIN" >> gateway.env
 
 echo "REGISTRY_NAME=$REGISTRY_NAME" >> .env
 
