@@ -8,9 +8,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  deplpoy:
+  deploy:
     name: Deploy to docker host
     runs-on: ubuntu-latest
+    environment: environment_production
 
     steps:
       - name: Checkout repository
