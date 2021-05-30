@@ -9,11 +9,11 @@ services:
       - PYTHONUNBUFFERED=1
     networks:
       - chatrooms_net
-  client:
+  gateway:
     environment:
       # node environment variables
       NODE_ENV: production
-      CLIENT_PORT: ${CLIENT_PORT:-4121}
+      GATEWAY_PORT: ${GATEWAY_PORT:-4121}
       SERVER_URL: http://server:${SERVER_PORT:-5000}
     depends_on:
       - server

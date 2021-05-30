@@ -4,7 +4,7 @@ const httpProxy = require('http-proxy');
 const path = require('path');
 
 // Constants
-const PORT = process.env.CLIENT_PORT || 4121;
+const PORT = process.env.GATEWAY_PORT || 4121;
 const HOST = '0.0.0.0';
 
 const SERVER_URL = process.env.SERVER_URL || 'http://localhost:5000';

@@ -3,14 +3,14 @@ version: "3.6"
 services:
   server:
     image: "${REGISTRY_NAME}/chatrooms/server:latest"
-  client:
+  gateway:
     image: "${REGISTRY_NAME}/chatrooms/client:latest"
     env_file:
-      - client.env
+      - gateway.env
     environment:
-      - VIRTUAL_PORT=${CLIENT_PORT:-4121}
+      - VIRTUAL_PORT=${GATEWAY_PORT:-4121}
     expose:
-      - ${CLIENT_PORT:-4121}
+      - ${GATEWAY_PORT:-4121}
     networks:
       - proxy
 
