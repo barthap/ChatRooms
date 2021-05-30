@@ -36,8 +36,6 @@ export default function ChatPage() {
         console.warn(err);
       }
     });
-    // a new message has arrived
-    manager.onChatMessageHandlers.addListener(msg => {});
     // server has assigned the user to a room
     manager.onCurrentRoomChangedHandlers.addListener(room => {
       setRoom(room);
