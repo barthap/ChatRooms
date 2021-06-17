@@ -16,6 +16,7 @@ A distributed system example - chat rooms project using Socket.io. Written as an
 - Displays list of active users
 - Automatically generated avatars for users and rooms
 - Technical stack:
+
   - React/Typescript frontend + chat-ui-kit-react lib
   - Python/Flask backend
   - Socket.IO for websocket communication, using Flask-SocketIO library
@@ -23,6 +24,8 @@ A distributed system example - chat rooms project using Socket.io. Written as an
   - Docker-compose based architecture
   - Github Actions CI pipeline with deploy to VPS Docker with nginx-proxy
   - Attachment Image hosting at imgbb.com
+
+  ![Demo screenshot](./assets/screenshot.png)
 
 ## Local development
 

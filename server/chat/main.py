@@ -119,7 +119,7 @@ class ChatNamespace(Namespace):
       log.info(f'{requester} has joined {room}')
       self._update_user_list()
 
-    # @socketio.on('send_message`)
+    # @socketio.on('send_message`, namespace='/chat')
     def on_send_message(self, data):
         sid = request.sid
         sender = self.sessions[sid]
