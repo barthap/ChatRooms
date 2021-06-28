@@ -127,4 +127,5 @@ To deploy app to publicly exposed production server (contact me to get address),
 5. Wait again for both Client and Server workflows to go green.
 6. Enter `Deploy` workflow on the left.
 7. Click `Run Workflow` on the right (select `main` branch), then click the green button.
-8. Wait for workflow to complete. The app is now live!
+8. Approve the workflow, or ask the owner for approval.
+9. Wait for workflow to complete. The app is now live!
