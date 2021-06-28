@@ -116,6 +116,8 @@ To start the proxy server:
 
 ## Deploying to production server
 
+> Currently, the deployment workflow is down, because the app is unused. In order to enable it, please follow [this instruction](./DEPLOYING.md).
+
 To deploy app to publicly exposed production server (contact me to get address), do the following:
 
 1. Create a Pull Request with your changes.
